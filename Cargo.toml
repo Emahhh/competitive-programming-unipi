@@ -14,3 +14,7 @@ path = "src/00_util.rs"
 [[bin]]
 name = "kadane"
 path = "src/01_kadane.rs"
+
+[[bin]]
+name = "recbins"
+path = "src/02_recursive_bin_search.rs"
