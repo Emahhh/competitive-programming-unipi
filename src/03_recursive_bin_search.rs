@@ -20,10 +20,16 @@ fn binary_search<T: Ord>(arr: &[T], needle: T, starting_index: usize) -> Option<
     return binary_search(&arr[middle .. len], needle, starting_index+middle);
 }
 
-pub fn main(){
+
+#[test]
+pub fn myTests(){
     let prova1 = [1,2,3,99,101,150,1097,2000];
     let res: Option<usize> = binary_search(&prova1, 3456977, 0);
     println!("il valore è presente all'indice: {:?}", res);
+    assert_eq!(res, None);
 
+    let res: Option<usize> = binary_search(&prova1, 1, 0);
+    println!("il valore è presente all'indice: {:?}", res);
+    assert_eq!(res, Some(0));
 }
 
