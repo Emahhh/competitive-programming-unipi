@@ -3,11 +3,12 @@
 /// 
 /// # Author
 /// - [Professor Venturini](https://pages.di.unipi.it/rossano/blog/2023/handson12324/)
+#[allow(dead_code)]
 mod trees {
-    struct Node {
-        key: u32,
-        id_left: Option<usize>,
-        id_right: Option<usize>,
+    pub struct Node {
+        pub key: u32,
+        pub id_left: Option<usize>,
+        pub id_right: Option<usize>,
     }
     
     impl Node {
@@ -20,7 +21,7 @@ mod trees {
         }
     }
     
-    struct Tree {
+    pub struct Tree {
         nodes: Vec<Node>,
     }
     
@@ -33,6 +34,10 @@ mod trees {
             Self {
                 nodes: vec![Node::new(key)],
             }
+        }
+
+        pub fn get_node(&self, id: usize) -> Option<&Node> {
+            self.nodes.get(id)
         }
     
         /// Adds a child to the node with `parent_id` and returns the id of the new node.
@@ -94,28 +99,6 @@ mod trees {
         }
     }
     
-    #[cfg(test)]
-    mod tests {
-        use super::*;
-    
-        #[test]
-        fn test_sum() {
-            let mut tree = Tree::with_root(10);
-    
-            assert_eq!(tree.sum(), 10);
-    
-            tree.add_node(0, 5, true); // id 1
-            tree.add_node(0, 22, false); // id 2
-    
-            assert_eq!(tree.sum(), 37);
-    
-            tree.add_node(1, 7, false); // id 3
-            tree.add_node(2, 20, true); // id 4
-    
-            assert_eq!(tree.sum(), 64);
-        }
-    }
-    
 
 }
 
@@ -148,12 +131,23 @@ fn is_bst(t: &trees::Tree) -> (bool, u32, u32) {
     const NEG_INF: u32 = u32::MIN; // since we are dealing with u32, the value is actually 0
     const INF: u32 = u32::MAX;
 
-    let first_node = t.nodes[0];
+    let first_node: Option<&trees::Node> = t.get_node(0);
 
-    match t {
+    match first_node {
         None => (true, NEG_INF, INF),
+
         Some(node) => {
-            let (is_left_a_bst, max_left, min_left) = is_bst(&node.id_left);
+            let (is_left_bst, max_left, min_right) = is_bst(t);
+            let (is_right_bst, max_right, min_left) = is_bst(t);
+
+            if !is_left_bst || !is_right_bst {
+                return (false, NEG_INF, INF);
+            }
+            
+            let am_i_bst : bool = (max_left <= node.key && node.key <= min_right);
+            let my_max = core::cmp::max(core::cmp::max(node.key, max_left), min_right);
+            let my_min = core::cmp::min(core::cmp::min(node.key, max_left), min_right);
+            return (am_i_bst, my_max, my_min);
         }
         
     }
@@ -166,9 +160,16 @@ pub fn main() {
 }
 
 
-/// Tests
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_is_bst_1() {
+        let mut tree = trees::Tree::with_root(10);
+        assert!(is_bst(&tree).0);
+    }
+
 }
 
