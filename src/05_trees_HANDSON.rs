@@ -1,3 +1,7 @@
+use core::cmp::max;
+use core::cmp::min;
+
+
 /// Basic Binary Tree implementation
 ///
 /// # Author
@@ -100,6 +104,7 @@ mod trees {
 }
 
 impl trees::Tree {
+
     /// Exercise 1
     /// Checks if the binary tree is a Binary Search Tree.
     pub fn is_bst(&self) -> bool {
@@ -130,10 +135,10 @@ impl trees::Tree {
 
         let am_i_bst: bool = max_left <= root.key && root.key <= min_right;
 
-        let my_max = core::cmp::max(core::cmp::max(root.key, max_left), min_right);
-        let my_min = core::cmp::min(core::cmp::min(root.key, max_left), min_right);
-        return (am_i_bst, my_max, my_min);
+        let new_max = max(root.key, max_left);
+        let new_min = min(root.key, min_right);
         
+        return (am_i_bst, new_max, new_min);
         
     }
 
@@ -141,9 +146,14 @@ impl trees::Tree {
 
 }
 
+
+
+
 pub fn main() {
     println!("Hello, trees handson!");
 }
+
+
 
 #[cfg(test)]
 mod tests {
@@ -151,12 +161,28 @@ mod tests {
 
     #[test]
     fn test_is_bst_1() {
-        let mut tree = trees::Tree::with_root(10);
-        assert!(tree.is_bst());
+        let mut test_tree = trees::Tree::with_root(10);
+        assert!(test_tree.is_bst());
+    
+        test_tree.add_node(0, 5, true); // id 1
+        test_tree.add_node(0, 22, false); // id 2
+        assert!(test_tree.is_bst());
 
-        tree.add_node(0, 5, true); // id 1
-        tree.add_node(0, 22, false); // id 2
+        test_tree.add_node(1, 7, false); // id 3
+        test_tree.add_node(2, 20, true); // id 4
+        assert!(test_tree.is_bst());
 
-        assert!(tree.is_bst());
+        test_tree.add_node(3, 7, false); // id 5
+        test_tree.add_node(4, 20, true); // id 6
+        assert!(test_tree.is_bst());
+
+        test_tree.add_node(5, 8, false); // id 7
+        test_tree.add_node(6, 21, true); // id 8
+        assert!(test_tree.is_bst());
+
+        test_tree.add_node(8, 1, false); // id 10
+        test_tree.add_node(7, 1000, true); // id 9
+        assert!(!test_tree.is_bst());
+        
     }
 }
