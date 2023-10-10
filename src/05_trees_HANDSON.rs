@@ -1,12 +1,15 @@
 #![allow(dead_code)]
 
-
 extern crate core;
 use core::cmp::max;
 use core::cmp::min;
 
+pub fn main() {
+    println!("Hello, trees handson!");
+}
+
+
 /// Basic Binary Tree implementation
-///
 /// # Author
 /// - [Professor Venturini](https://pages.di.unipi.it/rossano/blog/2023/handson12324/)
 #[allow(dead_code)]
@@ -28,7 +31,7 @@ mod trees {
     }
 
     pub struct Tree {
-       pub nodes: Vec<Node>,
+        pub nodes: Vec<Node>,
     }
 
     /// This a representation of a tree.
@@ -109,17 +112,24 @@ mod trees {
 
 
 
+
+// Start of EXERCISE 1 ------------------------------------------------------------------------------------
+
 impl trees::Tree {
 
 
 
     /// Exercise 1
-    /// Checks if the binary tree is a Binary Search Tree.
+    /// # Returns
+    /// True iff the tree (rooted at id 0) is a binary search tree. False otherwise.
     pub fn is_bst(&self) -> bool {
         self.helper_rec_is_bst(Some(0)).0
     }
 
-    /// returns (is_bst, max, min)
+    /// Helper recursive function for is_bst
+    /// # Returns
+    /// A tuple `(is_bst, max, min)`,
+    /// where `max` is the maximum value in the subtree, and `min` is the minimum.
     fn helper_rec_is_bst(&self, curr_root_id: Option<usize>) -> (bool, u32, u32) {
         const NEG_INF: u32 = u32::MIN; // since we are dealing with u32, the value is actually 0
         const INF: u32 = u32::MAX;
@@ -151,18 +161,10 @@ impl trees::Tree {
 }
 
 
-
-
-pub fn main() {
-    println!("Hello, trees handson!");
-}
-
-
-
+/// Tests for exercise 1
 #[cfg(test)]
-mod tests {
+mod ex_1_tests {
     use super::*;
-
 
     fn build_example_bst() -> trees::Tree {
         let mut tree = trees::Tree::with_root(20);
@@ -197,8 +199,6 @@ mod tests {
 
     #[test]
     fn test_is_bst_1() {
-        println!("test_is_bst_1 -------------------");
-
         // let's check if this tree is recognized as a bst
         let mut ex_tree = build_example_bst();
         assert!(ex_tree.is_bst());
@@ -206,11 +206,15 @@ mod tests {
         // let's add a node to this tree so that it is not a bst anymore
         ex_tree.add_node(12, 13, false);
         assert!(ex_tree.is_bst() == false , "this should not be a bst!");
+    }
 
-        // let's try another tree
+    // let's try another tree that is not a bst
+    #[test]
+    fn test_is_bst_2() {
         let mut t2: trees::Tree = build_example_bst();
         t2.add_node(12, 80, true);
         assert!(t2.is_bst() == false , "this should not be a bst!");
-        println!("end of test_is_bst_1 ------------------");
     }
 }
+
+// End of EXERCISE 1 ------------------------------------------------------------------------------------
