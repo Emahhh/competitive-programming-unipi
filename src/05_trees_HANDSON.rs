@@ -1,6 +1,9 @@
+#![allow(dead_code)]
+
+
+extern crate core;
 use core::cmp::max;
 use core::cmp::min;
-
 
 /// Basic Binary Tree implementation
 ///
@@ -25,7 +28,7 @@ mod trees {
     }
 
     pub struct Tree {
-        nodes: Vec<Node>,
+       pub nodes: Vec<Node>,
     }
 
     /// This a representation of a tree.
@@ -103,7 +106,12 @@ mod trees {
     }
 }
 
+
+
+
 impl trees::Tree {
+
+
 
     /// Exercise 1
     /// Checks if the binary tree is a Binary Search Tree.
@@ -121,9 +129,8 @@ impl trees::Tree {
 
         let current_root_opt: Option<&trees::Node> = self.get_node(curr_root_id.unwrap());
         if current_root_opt.is_none() {
-            return (false, NEG_INF, INF);
+            return (true, NEG_INF, INF);
         }
-
         let root: &trees::Node = current_root_opt.unwrap();
 
         let (is_left_bst, max_left, _ ) = self.helper_rec_is_bst(root.id_left);
@@ -135,8 +142,8 @@ impl trees::Tree {
 
         let am_i_bst: bool = max_left <= root.key && root.key <= min_right;
 
-        let new_max = max(root.key, max_left);
-        let new_min = min(root.key, min_right);
+        let new_max = max(root.key, max(max_left, min_right));
+        let new_min = min(root.key, min(max_left, min_right));
         
         return (am_i_bst, new_max, new_min);
         
@@ -159,30 +166,54 @@ pub fn main() {
 mod tests {
     use super::*;
 
+
+    fn example_bst() -> trees::Tree {
+        let mut tree = trees::Tree::with_root(20);
+
+        // first level
+        tree.add_node(0, 10, true); // id 1
+        tree.add_node(0, 21, false); // id 2
+
+        // second level
+        tree.add_node(1, 6, true); // id 3
+        tree.add_node(1, 15, false); // id 4
+
+        tree.add_node(2, 20, true); // id 5
+        tree.add_node(2, 100, false); //id 6
+
+        // third level
+        tree.add_node(3,1, true); // id 7
+        tree.add_node(3, 8, false); // id 8
+
+        tree.add_node(4, 14, true); // id 9
+        tree.add_node(4, 18, false); // id 10
+
+        tree.add_node(6, 115, false); // id 11
+
+        // fourth level
+        tree.add_node(11, 115, false); // id 12
+        tree.add_node(11, 115, true);
+
+
+        return tree;
+    }
+
     #[test]
     fn test_is_bst_1() {
-        let mut test_tree = trees::Tree::with_root(10);
-        assert!(test_tree.is_bst());
-    
-        test_tree.add_node(0, 5, true); // id 1
-        test_tree.add_node(0, 22, false); // id 2
-        assert!(test_tree.is_bst());
+        println!("test_is_bst_1 -------------------");
 
-        test_tree.add_node(1, 7, false); // id 3
-        test_tree.add_node(2, 20, true); // id 4
-        assert!(test_tree.is_bst());
+        // let's check if this tree is recognized as a bst
+        let mut ex_tree = example_bst();
+        assert!(ex_tree.is_bst());
 
-        test_tree.add_node(3, 7, false); // id 5
-        test_tree.add_node(4, 20, true); // id 6
-        assert!(test_tree.is_bst());
+        // let's add a node to this tree so that it is not a bst anymore
+        ex_tree.add_node(12, 13, false);
+        assert!(ex_tree.is_bst() == false , "this should not be a bst!");
 
-        test_tree.add_node(5, 8, false); // id 7
-        test_tree.add_node(6, 21, true); // id 8
-        assert!(test_tree.is_bst());
-
-        test_tree.add_node(8, 1, false); // id 10
-        test_tree.add_node(7, 1000, true); // id 9
-        assert!(!test_tree.is_bst());
-        
+        // let's try another tree
+        let mut t2: trees::Tree = example_bst();
+        t2.add_node(12, 80, true);
+        assert!(t2.is_bst() == false , "this should not be a bst!");
+        println!("end of test_is_bst_1 ------------------");
     }
 }
