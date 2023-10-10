@@ -119,6 +119,7 @@ impl trees::Tree {
         self.helper_rec_is_bst(Some(0)).0
     }
 
+    /// returns (is_bst, max, min)
     fn helper_rec_is_bst(&self, curr_root_id: Option<usize>) -> (bool, u32, u32) {
         const NEG_INF: u32 = u32::MIN; // since we are dealing with u32, the value is actually 0
         const INF: u32 = u32::MAX;
@@ -127,14 +128,10 @@ impl trees::Tree {
             return (true, NEG_INF, INF);
         }
 
-        let current_root_opt: Option<&trees::Node> = self.get_node(curr_root_id.unwrap());
-        if current_root_opt.is_none() {
-            return (true, NEG_INF, INF);
-        }
-        let root: &trees::Node = current_root_opt.unwrap();
+        let root: &trees::Node = self.get_node(curr_root_id.unwrap()).unwrap(); // should always be Some(node), unless the tree is not valid
 
-        let (is_left_bst, max_left, _ ) = self.helper_rec_is_bst(root.id_left);
-        let (is_right_bst, _ , min_right) = self.helper_rec_is_bst(root.id_right);
+        let (is_left_bst, max_left, min_left ) = self.helper_rec_is_bst(root.id_left);
+        let (is_right_bst, max_right, min_right) = self.helper_rec_is_bst(root.id_right);
 
         if !is_left_bst || !is_right_bst {
             return (false, NEG_INF, INF);
@@ -142,8 +139,8 @@ impl trees::Tree {
 
         let am_i_bst: bool = max_left <= root.key && root.key <= min_right;
 
-        let new_max = max(root.key, max(max_left, min_right));
-        let new_min = min(root.key, min(max_left, min_right));
+        let new_max = max(root.key, max(max_left, max_right));
+        let new_min = min(root.key, min(min_left, min_right));
         
         return (am_i_bst, new_max, new_min);
         
@@ -167,7 +164,7 @@ mod tests {
     use super::*;
 
 
-    fn example_bst() -> trees::Tree {
+    fn build_example_bst() -> trees::Tree {
         let mut tree = trees::Tree::with_root(20);
 
         // first level
@@ -203,7 +200,7 @@ mod tests {
         println!("test_is_bst_1 -------------------");
 
         // let's check if this tree is recognized as a bst
-        let mut ex_tree = example_bst();
+        let mut ex_tree = build_example_bst();
         assert!(ex_tree.is_bst());
 
         // let's add a node to this tree so that it is not a bst anymore
@@ -211,7 +208,7 @@ mod tests {
         assert!(ex_tree.is_bst() == false , "this should not be a bst!");
 
         // let's try another tree
-        let mut t2: trees::Tree = example_bst();
+        let mut t2: trees::Tree = build_example_bst();
         t2.add_node(12, 80, true);
         assert!(t2.is_bst() == false , "this should not be a bst!");
         println!("end of test_is_bst_1 ------------------");
