@@ -33,3 +33,10 @@ pub fn myTests(){
     assert_eq!(res, Some(0));
 }
 
+
+
+
+pub fn main() {
+    println!("Hello, reursive binary search!");
+}
+

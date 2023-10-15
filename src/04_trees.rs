@@ -63,3 +63,9 @@ mod tests {
     }
 
 }
+
+
+
+pub fn main() {
+    println!("Hello, trees!");
+}

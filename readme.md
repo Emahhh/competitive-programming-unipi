@@ -5,6 +5,16 @@ Repository containing my solutions to various exercises for the course "Competit
 - Naming convention: `<lesson-number>_name.rs`
 - After creating a new source file, rember to add it to the `Cargo.toml` file. This will enable VSCode's linting using `clippy`.
 
+
+## Running 
+
+To run your code in the terminal:
+- Run `cargo build` to compile your code for the entire crate.
+- Run `cargo run --bin bin_name` to run your program. Where `bin_name` is the name of your executable specified in the `Cargo.toml` file.
+- Run `cargo test --bin bin_name` to run your tests.
+  
+Or use VSCode's "Run" button over any "main" function or "test" function.
+
 ## Useful commands
 
 - use `cargo fmt` to format your code.
@@ -36,4 +46,5 @@ Some commonly used **assertion** macros include:
 - `assert!(condition, message)` - Asserts that `condition` is true and displays the `message` if the assertion fails.
 
 Finally, run `cargo test` or use VSCode's "tests" button.
+
 

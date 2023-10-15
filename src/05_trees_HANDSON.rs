@@ -5,13 +5,9 @@ use core::cmp::max;
 use core::cmp::min;
 
 
-
-
-
 /// Basic Binary Tree implementation
 /// # Author
 /// - [Professor Venturini](https://pages.di.unipi.it/rossano/blog/2023/handson12324/)
-#[allow(dead_code)]
 pub mod trees {
     pub struct Node {
         pub key: u32,
@@ -114,7 +110,7 @@ pub mod trees {
 
 
 
-/// implementation of  print_visualization_url, to visualize the tree in a web browser
+/// Utility: implementation of print_visualization_url, to visualize the tree in a web browser
 mod visualizer {
 
     use urlencoding::encode;
@@ -251,8 +247,6 @@ impl trees::Tree {
 
 
 }
-
-
 
 
 
@@ -430,7 +424,7 @@ mod ex_2_tests {
     #[test]
     fn test_left_subtree_unbalanced() {
         let mut tree = Tree::with_root(10);
-        let mut last_id = tree.add_node(0, 10, true);
+        let last_id = tree.add_node(0, 10, true);
         tree.add_node(last_id, 5, true);
 
         let (is_balanced, height) = tree.rec_helper_is_balanced(Some(0));
@@ -442,7 +436,7 @@ mod ex_2_tests {
     #[test]
     fn test_right_subtree_unbalanced() {
         let mut tree = Tree::with_root(10);
-        let mut last_id = tree.add_node(0, 10, false);
+        let last_id = tree.add_node(0, 10, false);
         tree.add_node(last_id, 5, false);
 
         let (is_balanced, height) = tree.rec_helper_is_balanced(Some(0));
