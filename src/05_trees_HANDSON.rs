@@ -3,7 +3,6 @@
 extern crate core;
 use core::cmp::max;
 use core::cmp::min;
-use std::cmp;
 
 pub fn main() {
     println!("Hello, trees handson!");
@@ -251,7 +250,6 @@ is_balanced(node) -> (bool, int) {
 */
 
 
-
 impl trees::Tree {
     pub fn is_balanced(&self) -> bool {
         self.rec_helper_is_balanced(Some(0)).0
@@ -307,10 +305,76 @@ impl trees::Tree {
 #[cfg(test)]
 mod ex_2_tests {
     use super::*;
-    
+    use trees::*;
 
+    #[test]
+    fn test_empty_tree() {
+        let tree = Tree::with_root(10);
+        let (is_balanced, height) = tree.rec_helper_is_balanced(None);
 
+        assert_eq!(is_balanced, true);
+        assert_eq!(height, 0);
+    }
 
+    #[test]
+    fn test_single_node() {
+        let mut tree = Tree::with_root(10);
+        let root_id = tree.add_node(0, 10, false);
+
+        let (is_balanced, height) = tree.rec_helper_is_balanced(Some(root_id));
+
+        assert_eq!(is_balanced, true);
+        assert_eq!(height, 1);
+    }
+
+    /// this tree should be not balanced, since the left subtree has a height of 2 and the right has 0
+    #[test]
+    fn test_left_subtree_unbalanced() {
+        let mut tree = Tree::with_root(10);
+        let mut last_id = tree.add_node(0, 10, true);
+        tree.add_node(last_id, 5, true);
+
+        let (is_balanced, height) = tree.rec_helper_is_balanced(Some(0));
+
+        assert!( !is_balanced );
+        assert_eq!(height, 3);
+    }
+
+    #[test]
+    fn test_right_subtree_unbalanced() {
+        let mut tree = Tree::with_root(10);
+        let mut last_id = tree.add_node(0, 10, false);
+        tree.add_node(last_id, 5, false);
+
+        let (is_balanced, height) = tree.rec_helper_is_balanced(Some(0));
+
+        assert!(!is_balanced);
+        assert_eq!(height, 3);
+    }
+
+    #[test]
+    fn test_simple_balanced_tree() {
+        let mut tree = Tree::with_root(10);
+        let _left_id = tree.add_node(0, 10, true);
+        let _right_id = tree.add_node(0, 10, false);
+
+        let (is_balanced, height) = tree.rec_helper_is_balanced(Some(0));
+
+        assert!(is_balanced);
+        assert_eq!(height, 2);
+    }
+
+    #[test]
+    fn test_another_balanced_tree() {
+        let mut tree = Tree::with_root(10);
+        let _left_id = tree.add_node(0, 10, true);
+        let _right_id = tree.add_node(0, 10, false);
+
+        let (is_balanced, height) = tree.rec_helper_is_balanced(Some(0));
+
+        assert!(is_balanced);
+        assert_eq!(height, 2);
+    }
 }
 
 
