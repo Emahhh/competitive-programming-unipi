@@ -4,9 +4,6 @@ extern crate core;
 use core::cmp::max;
 use core::cmp::min;
 
-pub fn main() {
-    println!("Hello, trees handson!");
-}
 
 
 /// Basic Binary Tree implementation
@@ -108,6 +105,95 @@ mod trees {
         }
     }
 }
+
+
+
+
+// Visualizer Utility -----------------------------------------------------
+
+use urlencoding::encode;
+
+/// # Tree visualizier
+/// A utility method to visualize a binary tree.
+impl trees::Tree {
+
+    /// useful to visualize the tree using Graphviz
+    /// # Returns 
+    /// the DOT representation of the tree,
+    pub fn to_dot(&self) -> String {
+        let mut dot = String::from("digraph Tree {\n");
+
+        // Traverse the tree and construct the DOT representation
+        self.rec_to_dot(0, &mut dot);
+
+        dot.push_str("}\n");
+        
+        dot
+    }
+
+    /// utility method to help print the DOT representation of the tree
+    fn rec_to_dot(&self, node_id: usize, dot: &mut String) {
+        if let Some(node) = self.get_node(node_id) {
+            
+            // print the dot line with the information about the current node
+            dot.push_str(&format!("  id{} [label=\"id={}\nvalue={}\"];\n", node_id, node_id, node.key));
+            
+            // print the edge to the left (if it exists) and its subtree
+            if let Some(left_id) = node.id_left {
+                dot.push_str(&format!("  id{} -> id{};\n", node_id, left_id));
+                self.rec_to_dot(left_id, dot);
+            }
+            
+            // print the edge to the right (if it exists) and its subtree
+            if let Some(right_id) = node.id_right {
+                dot.push_str(&format!("  id{} -> id{};\n", node_id, right_id));
+                self.rec_to_dot(right_id, dot);
+            }
+        }
+    }
+    
+    fn get_visualization_url(&self)-> String {
+        let dot_content = self.to_dot();
+        let encoded_dot = encode(&dot_content);
+        let edotor_url = format!(
+            "https://edotor.net/?engine=dot#{}",
+            encoded_dot
+        );
+        edotor_url
+    }
+
+    /// prints the URL to visualize the tree
+    pub fn print_visualization_url(&self) {
+        let divider = "----------------------------------------------------------------";
+        let intro_str = "You can visualize this tree at this URL:\n";
+        let url = self.get_visualization_url();
+        println!("{}", divider);
+        println!("{}", intro_str);
+        println!("{}", url);
+        println!("{}", divider);
+    }
+    
+}
+
+
+/// demo to show the print_visualization_url method
+fn main() {
+    println!("Hello, trees handson!");
+
+    // Create your binary tree
+    let mut tree = trees::Tree::with_root(10);
+    let _node_b = tree.add_node(0, 5, true);
+    let _node_c = tree.add_node(0, 15, false);
+    let _node_d = tree.add_node(_node_b, 3, true);
+    let _node_e = tree.add_node(_node_b, 7, false);
+
+    tree.print_visualization_url();
+}
+
+// end of visualizer utility ------------------------------------------------
+
+
+
 
 
 
@@ -379,3 +465,15 @@ mod ex_2_tests {
 
 
 // End of EXERCISE 2 ------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
