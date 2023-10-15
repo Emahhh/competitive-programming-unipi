@@ -3,6 +3,7 @@
 extern crate core;
 use core::cmp::max;
 use core::cmp::min;
+use std::cmp;
 
 pub fn main() {
     println!("Hello, trees handson!");
@@ -118,8 +119,6 @@ mod trees {
 impl trees::Tree {
 
 
-
-    /// Exercise 1
     /// # Returns
     /// True iff the tree (rooted at id 0) is a binary search tree. False otherwise.
     pub fn is_bst(&self) -> bool {
@@ -218,3 +217,101 @@ mod ex_1_tests {
 }
 
 // End of EXERCISE 1 ------------------------------------------------------------------------------------
+
+
+
+
+
+
+// Start of EXERCISE 2 ------------------------------------------------------------------------------------
+
+/*
+# Request:
+Write a method to check if the binary tree is balanced.
+A tree is considered balanced if, for each of its nodes, the heights of its left and right subtrees differ by at most one.
+
+# Pseudocode:
+
+```
+is_balanced(node) -> (bool, int) {
+    if node is None {
+        return (True, 0)
+    }
+
+    let (is_balanced_left, height_left) = is_balanced(node.left);
+    let (is_balanced_right, height_right) = is_balanced(node.right);
+
+    let am_i_balanced = is_balanced_left && is_balanced_right && abs(height_left - height_right) <= 1;
+    let new_height = max(height_left, height_right) + 1;
+
+    return (am_i_balanced, new_height);
+}
+```
+
+*/
+
+
+
+impl trees::Tree {
+    pub fn is_balanced(&self) -> bool {
+        self.rec_helper_is_balanced(Some(0)).0
+    }
+
+    /// Recursively checks if the binary tree is balanced.
+    ///
+    /// This function is used  (as a helper function) to recursively determine if the binary tree, rooted at the `curr_id_opt` node,
+    /// is balanced.
+    ///
+    /// # Arguments
+    ///
+    /// * `curr_id_opt` - The ID of the node to be considered as the root. Pass `None` to check the entire tree.
+    ///
+    /// # Returns
+    ///
+    /// A tuple `(bool, u32)` where the first element is `true` if the tree is balanced, and the second element
+    /// represents the height of the tree.
+    fn rec_helper_is_balanced(&self, curr_id_opt: Option<usize>) -> (bool, u32) {
+        if curr_id_opt.is_none(){
+            return (true, 0);
+        }
+        let curr_id = curr_id_opt.unwrap();
+
+
+        let curr_node_opt = self.get_node(curr_id);
+        if curr_node_opt.is_none() {
+            return (true, 0);
+        }
+        let curr_node = curr_node_opt.unwrap();
+
+        let (is_balanced_left, height_left) = self.rec_helper_is_balanced(curr_node.id_left);
+        let (is_balanced_right, height_right) = self.rec_helper_is_balanced(curr_node.id_right);
+
+        let am_i_balanced: bool = 
+            is_balanced_left &&
+            is_balanced_right &&
+            ( height_left.abs_diff(height_right) <= 1 )
+        ;
+
+        let new_height = max(height_left, height_right) + 1;
+
+        return (am_i_balanced, new_height);
+    }
+
+
+
+}
+
+
+
+/// Tests for exercise 2
+#[cfg(test)]
+mod ex_2_tests {
+    use super::*;
+    
+
+
+
+}
+
+
+// End of EXERCISE 2 ------------------------------------------------------------------------------------
