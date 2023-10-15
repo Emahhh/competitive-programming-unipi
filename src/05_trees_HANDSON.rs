@@ -6,11 +6,13 @@ use core::cmp::min;
 
 
 
+
+
 /// Basic Binary Tree implementation
 /// # Author
 /// - [Professor Venturini](https://pages.di.unipi.it/rossano/blog/2023/handson12324/)
 #[allow(dead_code)]
-mod trees {
+pub mod trees {
     pub struct Node {
         pub key: u32,
         pub id_left: Option<usize>,
@@ -109,71 +111,81 @@ mod trees {
 
 
 
-// Visualizer Utility -----------------------------------------------------
 
-use urlencoding::encode;
 
-/// # Tree visualizier
-/// A utility method to visualize a binary tree.
-impl trees::Tree {
 
-    /// useful to visualize the tree using Graphviz
-    /// # Returns 
-    /// the DOT representation of the tree,
-    pub fn to_dot(&self) -> String {
-        let mut dot = String::from("digraph Tree {\n");
+/// implementation of  print_visualization_url, to visualize the tree in a web browser
+mod visualizer {
 
-        // Traverse the tree and construct the DOT representation
-        self.rec_to_dot(0, &mut dot);
+    use urlencoding::encode;
+    use crate::trees;
 
-        dot.push_str("}\n");
-        
-        dot
-    }
+    impl trees::Tree {
 
-    /// utility method to help print the DOT representation of the tree
-    fn rec_to_dot(&self, node_id: usize, dot: &mut String) {
-        if let Some(node) = self.get_node(node_id) {
+        /// useful to visualize the tree using Graphviz
+        /// # Returns 
+        /// the DOT representation of the tree,
+        pub fn to_dot(&self) -> String {
+            let mut dot = String::from("digraph Tree {\n");
+
+            // Traverse the tree and construct the DOT representation
+            self.rec_to_dot(0, &mut dot);
+
+            dot.push_str("}\n");
             
-            // print the dot line with the information about the current node
-            dot.push_str(&format!("  id{} [label=\"id={}\nvalue={}\"];\n", node_id, node_id, node.key));
-            
-            // print the edge to the left (if it exists) and its subtree
-            if let Some(left_id) = node.id_left {
-                dot.push_str(&format!("  id{} -> id{};\n", node_id, left_id));
-                self.rec_to_dot(left_id, dot);
-            }
-            
-            // print the edge to the right (if it exists) and its subtree
-            if let Some(right_id) = node.id_right {
-                dot.push_str(&format!("  id{} -> id{};\n", node_id, right_id));
-                self.rec_to_dot(right_id, dot);
+            dot
+        }
+
+        /// utility method to help print the DOT representation of the tree
+        fn rec_to_dot(&self, node_id: usize, dot: &mut String) {
+            if let Some(node) = self.get_node(node_id) {
+                
+                // print the dot line with the information about the current node
+                dot.push_str(&format!("  id{} [label=\"id={}\nvalue={}\"];\n", node_id, node_id, node.key));
+                
+                // print the edge to the left (if it exists) and its subtree
+                if let Some(left_id) = node.id_left {
+                    dot.push_str(&format!("  id{} -> id{};\n", node_id, left_id));
+                    self.rec_to_dot(left_id, dot);
+                }
+                
+                // print the edge to the right (if it exists) and its subtree
+                if let Some(right_id) = node.id_right {
+                    dot.push_str(&format!("  id{} -> id{};\n", node_id, right_id));
+                    self.rec_to_dot(right_id, dot);
+                }
             }
         }
-    }
-    
-    fn get_visualization_url(&self)-> String {
-        let dot_content = self.to_dot();
-        let encoded_dot = encode(&dot_content);
-        let edotor_url = format!(
-            "https://edotor.net/?engine=dot#{}",
-            encoded_dot
-        );
-        edotor_url
+        
+        fn get_visualization_url(&self)-> String {
+            let dot_content = self.to_dot();
+            let encoded_dot = encode(&dot_content);
+            let edotor_url = format!(
+                "https://edotor.net/?engine=dot#{}",
+                encoded_dot
+            );
+            edotor_url
+        }
+
+        /// prints the URL to visualize the tree
+        pub fn print_visualization_url(&self) {
+            let divider = "----------------------------------------------------------------";
+            let intro_str = "You can visualize this tree at this URL:\n";
+            let url = self.get_visualization_url();
+            println!("{}", divider);
+            println!("{}", intro_str);
+            println!("{}", url);
+            println!("{}", divider);
+        }
+        
     }
 
-    /// prints the URL to visualize the tree
-    pub fn print_visualization_url(&self) {
-        let divider = "----------------------------------------------------------------";
-        let intro_str = "You can visualize this tree at this URL:\n";
-        let url = self.get_visualization_url();
-        println!("{}", divider);
-        println!("{}", intro_str);
-        println!("{}", url);
-        println!("{}", divider);
-    }
-    
 }
+
+
+
+
+
 
 
 /// demo to show the print_visualization_url method
@@ -190,17 +202,13 @@ fn main() {
     tree.print_visualization_url();
 }
 
-// end of visualizer utility ------------------------------------------------
 
 
 
 
 
 
-
-
-// Start of EXERCISE 1 ------------------------------------------------------------------------------------
-
+/// # Exercise 1
 impl trees::Tree {
 
 
@@ -245,7 +253,10 @@ impl trees::Tree {
 }
 
 
-/// Tests for exercise 1
+
+
+
+/// # Tests for exercise 1
 #[cfg(test)]
 mod ex_1_tests {
     use super::*;
@@ -301,42 +312,44 @@ mod ex_1_tests {
     }
 }
 
-// End of EXERCISE 1 ------------------------------------------------------------------------------------
 
 
 
 
 
 
-// Start of EXERCISE 2 ------------------------------------------------------------------------------------
-
-/*
-# Request:
-Write a method to check if the binary tree is balanced.
-A tree is considered balanced if, for each of its nodes, the heights of its left and right subtrees differ by at most one.
-
-# Pseudocode:
-
-```
-is_balanced(node) -> (bool, int) {
-    if node is None {
-        return (True, 0)
-    }
-
-    let (is_balanced_left, height_left) = is_balanced(node.left);
-    let (is_balanced_right, height_right) = is_balanced(node.right);
-
-    let am_i_balanced = is_balanced_left && is_balanced_right && abs(height_left - height_right) <= 1;
-    let new_height = max(height_left, height_right) + 1;
-
-    return (am_i_balanced, new_height);
-}
-```
-
-*/
 
 
+
+/// # Exercise 2
 impl trees::Tree {
+
+    /*
+    # Request:
+    Write a method to check if the binary tree is balanced.
+    A tree is considered balanced if, for each of its nodes, the heights of its left and right subtrees differ by at most one.
+
+    # Pseudocode:
+
+    ```
+    is_balanced(node) -> (bool, int) {
+        if node is None {
+            return (True, 0)
+        }
+
+        let (is_balanced_left, height_left) = is_balanced(node.left);
+        let (is_balanced_right, height_right) = is_balanced(node.right);
+
+        let am_i_balanced = is_balanced_left && is_balanced_right && abs(height_left - height_right) <= 1;
+        let new_height = max(height_left, height_right) + 1;
+
+        return (am_i_balanced, new_height);
+    }
+    ```
+
+    */
+
+
     pub fn is_balanced(&self) -> bool {
         self.rec_helper_is_balanced(Some(0)).0
     }
@@ -462,14 +475,6 @@ mod ex_2_tests {
         assert_eq!(height, 2);
     }
 }
-
-
-// End of EXERCISE 2 ------------------------------------------------------------------------------------
-
-
-
-
-
 
 
 
