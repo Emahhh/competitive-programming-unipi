@@ -323,6 +323,7 @@ impl trees::Tree {
     Write a method to check if the binary tree is balanced.
     A tree is considered balanced if, for each of its nodes, the heights of its left and right subtrees differ by at most one.
 
+
     # Pseudocode:
 
     ```
@@ -346,6 +347,10 @@ impl trees::Tree {
 
     pub fn is_balanced(&self) -> bool {
         self.rec_helper_is_balanced(Some(0)).0
+    }
+
+    pub fn get_height(&self) -> u32 {
+        self.rec_helper_is_balanced(Some(0)).1
     }
 
     /// Recursively checks if the binary tree is balanced.
@@ -400,24 +405,27 @@ mod ex_2_tests {
     use super::*;
     use trees::*;
 
-    #[test]
-    fn test_empty_tree() {
-        let tree = Tree::with_root(10);
-        let (is_balanced, height) = tree.rec_helper_is_balanced(None);
-
-        assert_eq!(is_balanced, true);
-        assert_eq!(height, 0);
-    }
 
     #[test]
     fn test_single_node() {
+        let tree = Tree::with_root(10);
+
+        tree.print_visualization_url();
+
+        assert_eq!(tree.is_balanced(), true);
+        assert_eq!(tree.get_height(), 1);
+    }
+
+
+    #[test]
+    fn test_two_nodes() {
         let mut tree = Tree::with_root(10);
-        let root_id = tree.add_node(0, 10, false);
+        tree.add_node(0, 10, true);
 
-        let (is_balanced, height) = tree.rec_helper_is_balanced(Some(root_id));
+        tree.print_visualization_url();
 
-        assert_eq!(is_balanced, true);
-        assert_eq!(height, 1);
+        assert_eq!(tree.is_balanced(), true);
+        assert_eq!(tree.get_height(), 2);
     }
 
     /// this tree should be not balanced, since the left subtree has a height of 2 and the right has 0
@@ -427,10 +435,10 @@ mod ex_2_tests {
         let last_id = tree.add_node(0, 10, true);
         tree.add_node(last_id, 5, true);
 
-        let (is_balanced, height) = tree.rec_helper_is_balanced(Some(0));
+        tree.print_visualization_url();
 
-        assert!( !is_balanced );
-        assert_eq!(height, 3);
+        assert!( tree.is_balanced() == false);
+        assert_eq!(tree.get_height(), 3);
     }
 
     #[test]
@@ -439,10 +447,10 @@ mod ex_2_tests {
         let last_id = tree.add_node(0, 10, false);
         tree.add_node(last_id, 5, false);
 
-        let (is_balanced, height) = tree.rec_helper_is_balanced(Some(0));
+        tree.print_visualization_url();
 
-        assert!(!is_balanced);
-        assert_eq!(height, 3);
+        assert!(tree.is_balanced() == false);
+        assert_eq!(tree.get_height(), 3);
     }
 
     #[test]
@@ -451,11 +459,12 @@ mod ex_2_tests {
         let _left_id = tree.add_node(0, 10, true);
         let _right_id = tree.add_node(0, 10, false);
 
-        let (is_balanced, height) = tree.rec_helper_is_balanced(Some(0));
+        tree.print_visualization_url();
 
-        assert!(is_balanced);
-        assert_eq!(height, 2);
+        assert!(tree.is_balanced() == true);
+        assert_eq!(tree.get_height(), 2);
     }
+
 
     #[test]
     fn test_another_balanced_tree() {
@@ -463,11 +472,16 @@ mod ex_2_tests {
         let _left_id = tree.add_node(0, 10, true);
         let _right_id = tree.add_node(0, 10, false);
 
-        let (is_balanced, height) = tree.rec_helper_is_balanced(Some(0));
+        tree.add_node(_left_id, 999, true);
+        tree.add_node(_right_id, 65, false);
 
-        assert!(is_balanced);
-        assert_eq!(height, 2);
+        tree.print_visualization_url();
+
+        assert!(tree.is_balanced() == true);
+        assert_eq!(tree.get_height(), 3);
     }
+
+
 }
 
 
