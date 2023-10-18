@@ -1,12 +1,16 @@
 #![allow(dead_code)]
 
+//! # Hands-On 1 -Tree Traversals
+//! This is the first hands-on of the course, consisting of 3 exercises.
+//! Website page with the requests: https://pages.di.unipi.it/rossano/blog/2023/handson12324/
+
 extern crate core;
 use core::cmp::max;
 use core::cmp::min;
 
-const PRINT_TREE: bool = true; // set to true to print the tree using the `print_visualization_url()` method
 
-
+/// set to true to print the tree using the `print_visualization_url()` method
+const PRINT_TREE: bool = true; 
 
 
 
@@ -116,7 +120,9 @@ pub mod trees {
 
 
 
-/// Utility: implementation of print_visualization_url, to visualize the tree in a web browser
+/// # Optional utility: tree visualizer
+/// 
+/// implementation of some methods to graphically visualize the tree in a web browser
 mod visualizer {
 
     use urlencoding::encode;
@@ -138,7 +144,6 @@ mod visualizer {
             dot
         }
 
-        /// utility method to help print the DOT representation of the tree
         fn rec_to_dot(&self, node_id: usize, dot: &mut String) {
             if let Some(node) = self.get_node(node_id) {
                 
@@ -159,6 +164,8 @@ mod visualizer {
             }
         }
         
+        /// # Returns
+        /// A string representing the URL to visualize the tree in a web browser
         pub fn get_visualization_url(&self)-> String {
             let dot_content = self.to_dot();
             let encoded_dot = encode(&dot_content);
@@ -169,7 +176,7 @@ mod visualizer {
             edotor_url
         }
 
-        /// prints the URL to visualize the tree
+        /// prints the URL to visualize the tree, along with some additional text (printed in an atomic way before the URL)
         /// # Arguments
         /// `additional_text`: additional text to print before the URL (useful to recognize the tree between many)
         pub fn print_visualization_url(&self, additional_text: &str) {
@@ -215,6 +222,8 @@ fn main() {
 
 
 /// # Exercise 1
+/// 
+/// Write a method to check if the binary tree is a Binary Search Tree.
 impl trees::Tree {
 
 
@@ -226,8 +235,10 @@ impl trees::Tree {
 
 
     /// Helper recursive function for is_bst
+    /// 
     /// # Returns
     /// A tuple `(is_bst, max, min)`,
+    /// 
     /// where `max` is the maximum value in the subtree, and `min` is the minimum.
     fn helper_rec_is_bst(&self, curr_root_id: Option<usize>) -> (bool, u32, u32) {
         const NEG_INF: u32 = u32::MIN; // since we are dealing with u32, the value is actually 0
@@ -336,34 +347,30 @@ mod ex_1_tests {
 
 
 /// # Exercise 2
+/// 
+/// Write a method to check if the binary tree is balanced.
+/// 
+/// A tree is considered balanced if, for each of its nodes, the heights of its left and right subtrees differ by at most one.
+/// 
+/// /// # Pseudocode:
+///
+/// ```
+/// is_balanced(node) -> (bool, int) {
+///     if node is None {
+///         return (True, 0)
+///     }
+///
+///     let (is_balanced_left, height_left) = is_balanced(node.left);
+///     let (is_balanced_right, height_right) = is_balanced(node.right);
+///
+///     let am_i_balanced = is_balanced_left && is_balanced_right && abs(height_left - height_right) <= 1;
+///     let new_height = max(height_left, height_right) + 1;
+///
+///     return (am_i_balanced, new_height);
+/// }
+/// ```
+///
 impl trees::Tree {
-
-    /*
-    # Request:
-    Write a method to check if the binary tree is balanced.
-    A tree is considered balanced if, for each of its nodes, the heights of its left and right subtrees differ by at most one.
-
-
-    # Pseudocode:
-
-    ```
-    is_balanced(node) -> (bool, int) {
-        if node is None {
-            return (True, 0)
-        }
-
-        let (is_balanced_left, height_left) = is_balanced(node.left);
-        let (is_balanced_right, height_right) = is_balanced(node.right);
-
-        let am_i_balanced = is_balanced_left && is_balanced_right && abs(height_left - height_right) <= 1;
-        let new_height = max(height_left, height_right) + 1;
-
-        return (am_i_balanced, new_height);
-    }
-    ```
-
-    */
-
 
     pub fn is_balanced(&self) -> bool {
         self.rec_helper_is_balanced(Some(0)).0
@@ -523,11 +530,15 @@ mod ex_2_tests {
 
 
 /// # Exercise 3
+/// Write a method to check if the binary tree is a max-heap.
+/// 
+/// A max-heap is a complete binary tree in which every node satisfies the max-heap property.
+/// 
+/// Complete Binary Tree: Every level in the binary tree (except possibly the lowest level), is completely filled, and all vertices in the last level are as far left as possible.
+/// 
+/// A node satisfies the max-heap property: if its key is greater than or equal to the keys of its children.
+
 impl trees::Tree {
-    // Write a method to check if the binary tree is a max-heap.
-    // A max-heap is a complete binary tree in which every node satisfies the max-heap property.
-    // Complete Binary Tree: Every level in the binary tree, except possibly the last/lowest level, is completely filled, and all vertices in the last level are as far left as possible.
-    // A node satisfies the max-heap property: if its key is greater than or equal to the keys of its children.
 
     /// # Returns
     /// true iff the tree is a max-heap
@@ -574,9 +585,8 @@ impl trees::Tree {
         let mut is_complete: bool = true;
 
         if curr_node.id_left.is_some() && curr_node.id_right.is_none(){ // if this node has a left child but not a right child
-            // TODO: replace with "i have seen right incomplete node before" flag
             let incomplete_nodes_count_new = incomplete_nodes_count + 1;
-            if incomplete_nodes_count_new > 1 {
+            if incomplete_nodes_count_new > 1 { 
                 is_complete = false;
             }
         }
@@ -599,26 +609,6 @@ impl trees::Tree {
         return (is_max_heap, curr_max );
     }
 
-
-/*     pub fn get_height(&self) -> u32 {
-        self.rechelper_get_height(Some(0), 0) 
-    }
-
-    fn rechelper_get_height(&self, curr_id_opt: Option<usize>, curr_level: u32) -> u32{
-        if curr_id_opt.is_none(){
-            return curr_level;
-        }
-        let curr_id = curr_id_opt.unwrap();
-
-        let curr_node_opt = &self.get_node(curr_id);
-        if curr_node_opt.is_none() {
-            return curr_level;
-        }
-
-        let curr_node = curr_node_opt.unwrap();
-
-        return max( self.rechelper_get_height(curr_node.id_left, curr_level + 1), self.rechelper_get_height(curr_node.id_right, curr_level + 1) );
-    } */
 
 }
 
@@ -669,14 +659,9 @@ mod max_heap_tests {
         tree.add_node(last_id, 5, true);
         let (is_max_heap, max_value) = tree.is_max_heap_with_max();
 
-        let mut output = String::new();
-        output.push_str("Function: test_max_heap_with_left_subtree_unbalanced\n");
-        output.push_str("==================================================\n");
-        output.push_str("Visualization URL: ");
-        output.push_str(&tree.get_visualization_url());
-        output.push_str("\n------------------------------\n");
-
-        println!("{}", output);
+        if PRINT_TREE {
+            tree.print_visualization_url("Tree inside test_max_heap_with_left_subtree_unbalanced:");
+        }
 
         assert_eq!(is_max_heap, false);
         assert_eq!(max_value, 10);
@@ -689,14 +674,9 @@ mod max_heap_tests {
         tree.add_node(last_id, 5, false);
         let (is_max_heap, max_value) = tree.is_max_heap_with_max();
 
-        let mut output = String::new();
-        output.push_str("Function: test_max_heap_with_right_subtree_unbalanced\n");
-        output.push_str("===================================================\n");
-        output.push_str("Visualization URL: ");
-        output.push_str(&tree.get_visualization_url());
-        output.push_str("\n------------------------------\n");
-
-        println!("{}", output);
+        if PRINT_TREE {
+            tree.print_visualization_url("Tree inside test_max_heap_with_right_subtree_unbalanced:");
+        }
 
         assert_eq!(is_max_heap, false);
         assert_eq!(max_value, 10);
@@ -714,14 +694,9 @@ mod max_heap_tests {
 
         let (is_max_heap, max_value) = tree.is_max_heap_with_max();
 
-        let mut output = String::new();
-        output.push_str("Function: test_max_heap_small\n");
-        output.push_str("===================================================\n");
-        output.push_str("Visualization URL: ");
-        output.push_str(&tree.get_visualization_url());
-        output.push_str("\n------------------------------\n");
-
-        println!("{}", output);
+        if PRINT_TREE {
+            tree.print_visualization_url("Tree inside test_max_heap_small:");
+        }
 
         assert_eq!(is_max_heap, true);
         assert_eq!(max_value, 9);
@@ -747,14 +722,9 @@ mod max_heap_tests {
 
         let (is_max_heap, max_value) = tree.is_max_heap_with_max();
 
-        let mut output = String::new();
-        output.push_str("Function: a_random_heap\n");
-        output.push_str("===================================================\n");
-        output.push_str("Visualization URL: ");
-        output.push_str(&tree.get_visualization_url());
-        output.push_str("\n------------------------------\n");
-
-        println!("{}", output);
+        if PRINT_TREE {
+            tree.print_visualization_url("Tree inside a_random_heap:");
+        }
 
         assert_eq!(is_max_heap, true);
         assert_eq!(max_value, 76);
@@ -780,14 +750,9 @@ mod max_heap_tests {
 
         let (is_max_heap, max_value) = tree.is_max_heap_with_max();
 
-        let mut output = String::new();
-        output.push_str("Function: a_random_non_heap\n");
-        output.push_str("===================================================\n");
-        output.push_str("Visualization URL: ");
-        output.push_str(&tree.get_visualization_url());
-        output.push_str("\n------------------------------\n");
-
-        println!("{}", output);
+        if PRINT_TREE {
+            tree.print_visualization_url("Tree inside a_random_non_heap:");
+        }
 
         assert_eq!(is_max_heap, false);
         assert_eq!(max_value, 76);
@@ -811,13 +776,36 @@ mod max_heap_tests {
 
         let (is_max_heap, max_value) = tree.is_max_heap_with_max();
 
-        let mut output = String::new();
-        output.push_str("Function: a_random_non_heap\n");
-        output.push_str("===================================================\n");
-        output.push_str("Visualization URL: ");
-        output.push_str(&tree.get_visualization_url());
-        output.push_str("\n------------------------------\n");
-        println!("{}", output);
+        if PRINT_TREE {
+            tree.print_visualization_url("Tree inside another_random_non_heap:");
+        }
+
+        assert_eq!(is_max_heap, false);
+        assert_eq!(max_value, 76);
+    }
+
+    #[test]
+    fn non_heap_final() {
+        let mut tree = Tree::with_root(76);
+
+        tree.add_node(0, 67, true); // id 1
+        tree.add_node(0, 36, false); // id 2
+
+        tree.add_node(1, 62, true); // id 3
+        tree.add_node(1, 62, false); // id 4
+        tree.add_node(2, 32, true); // id 5
+        tree.add_node(2, 15, false); // id 6
+
+        tree.add_node(3, 5, false); // id 7
+        tree.add_node(3, 15, true); // id 8
+
+        tree.add_node(5, 1, true); // id 9
+
+        let (is_max_heap, max_value) = tree.is_max_heap_with_max();
+
+        if PRINT_TREE {
+            tree.print_visualization_url("Tree inside non_heap_final:");
+        }
 
         assert_eq!(is_max_heap, false);
         assert_eq!(max_value, 76);

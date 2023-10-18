@@ -22,6 +22,12 @@ Or use VSCode's "Run" button over any "main" function or "test" function.
 
 ## Testing
 
+### Running tests
+
+- Run `cargo test --bin trees_handson ` to run all tests for the `trees_handson` binary.
+- Run `cargo test --bin trees_handson -- --nocapture` to run tests without capturing output (so you can see the output in the terminal).
+
+### Writing tests
 Write some tests in the same file using this format:
 
 ```rust
