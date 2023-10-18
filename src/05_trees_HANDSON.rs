@@ -153,7 +153,7 @@ mod visualizer {
             }
         }
         
-        fn get_visualization_url(&self)-> String {
+        pub fn get_visualization_url(&self)-> String {
             let dot_content = self.to_dot();
             let encoded_dot = encode(&dot_content);
             let edotor_url = format!(
@@ -490,3 +490,189 @@ mod ex_2_tests {
 
 
 
+/// # Exercise 3
+impl trees::Tree {
+    // Write a method to check if the binary tree is a max-heap.
+    // A max-heap is a complete binary tree in which every node satisfies the max-heap property.
+    // Complete Binary Tree: Every level in the binary tree, except possibly the last/lowest level, is completely filled, and all vertices in the last level are as far left as possible.
+    // A node satisfies the max-heap property: if its key is greater than or equal to the keys of its children.
+
+    /// # Returns
+    /// true iff the tree is a max-heap
+    pub fn is_max_heap(&self) -> bool {
+        self.rec_helper_heap(Some(0), 0, self.get_height()).0
+    }
+
+
+    /// # Returns
+    /// a couple, where:
+    /// - the first item is true iff the tree is a max-heap
+    /// - the second item is the max value in the tree
+    pub fn is_max_heap_with_max(&self) -> (bool, u32) {
+        let tree_height = self.get_height();
+
+        self.rec_helper_heap(Some(0), 0, tree_height)
+    }
+
+
+
+
+    fn rec_helper_heap(&self, curr_id_opt: Option<usize>, curr_level: u32, tree_height: u32) -> (bool, u32){
+        if curr_id_opt.is_none(){
+            // in a complete tree, only the two lowest level can have empty nodes
+            if (curr_level == tree_height) ||  (curr_level == tree_height-1) { 
+                return (true, curr_level); 
+            }
+            return (false, curr_level); 
+        }
+        let curr_id = curr_id_opt.unwrap();
+
+
+        let curr_node_opt = &self.get_node(curr_id);
+        if curr_node_opt.is_none() {
+            if (curr_level == tree_height) ||  (curr_level == tree_height-1) {
+                return (true, curr_level); 
+            }
+            return (false, curr_level); 
+        }
+        let curr_node = curr_node_opt.unwrap();
+
+        let (is_max_heap_left, max_left) = self.rec_helper_heap(curr_node.id_left, curr_level+1, tree_height);
+        let (is_max_heap_right, max_right) = self.rec_helper_heap(curr_node.id_right, curr_level+1, tree_height);
+
+
+        // complete tree property
+        // let's check if the current tree is a complete binary tree
+        let mut is_complete: bool = true;
+
+        if curr_node.id_left.is_some() && curr_node.id_right.is_none(){ // if this node has a left child but not a right child
+            if curr_id != (self.nodes.len() - 1 ) { // it should be the last one in the tree (hence vector)
+                is_complete = false; // otherwise, the tree is not complete
+            }
+        }
+
+        // let's check the max-heap property for the current node
+        // the current node must have a value greater than its left and right subtrees
+        let curr_max = max(curr_node.key, max(max_left, max_right)   );
+        let is_max: bool = curr_node.key == curr_max;
+
+        // finally, we put the conditions together
+        let is_max_heap = is_max_heap_left && is_max_heap_right && is_complete && is_max;
+        return (is_max_heap, curr_max);
+    }
+
+
+/*     pub fn get_height(&self) -> u32 {
+        self.rechelper_get_height(Some(0), 0) 
+    }
+
+    fn rechelper_get_height(&self, curr_id_opt: Option<usize>, curr_level: u32) -> u32{
+        if curr_id_opt.is_none(){
+            return curr_level;
+        }
+        let curr_id = curr_id_opt.unwrap();
+
+        let curr_node_opt = &self.get_node(curr_id);
+        if curr_node_opt.is_none() {
+            return curr_level;
+        }
+
+        let curr_node = curr_node_opt.unwrap();
+
+        return max( self.rechelper_get_height(curr_node.id_left, curr_level + 1), self.rechelper_get_height(curr_node.id_right, curr_level + 1) );
+    } */
+
+}
+
+
+
+
+
+
+
+
+
+#[cfg(test)]
+mod max_heap_tests {
+    use super::*;
+    use trees::*;
+
+    #[test]
+    fn test_single_node_max_heap() {
+        let tree = Tree::with_root(10);
+        let (is_max_heap, max_value) = tree.is_max_heap_with_max();
+
+        let mut output = String::new();
+        output.push_str("Function: test_single_node_max_heap\n");
+        output.push_str("==================================\n");
+        output.push_str("Visualization URL: ");
+        output.push_str(&tree.get_visualization_url());
+        output.push_str("\n------------------------------\n");
+
+        println!("{}", output);
+
+        assert_eq!(is_max_heap, true);
+        assert_eq!(max_value, 10);
+    }
+
+    #[test]
+    fn test_two_nodes_max_heap() {
+        let mut tree = Tree::with_root(10);
+        tree.add_node(0, 10, true);
+        let (is_max_heap, max_value) = tree.is_max_heap_with_max();
+
+        let mut output = String::new();
+        output.push_str("Function: test_two_nodes_max_heap\n");
+        output.push_str("=================================\n");
+        output.push_str("Visualization URL: ");
+        output.push_str(&tree.get_visualization_url());
+        output.push_str("\n------------------------------\n");
+
+        println!("{}", output);
+
+        assert_eq!(is_max_heap, true);
+        assert_eq!(max_value, 10);
+    }
+
+    #[test]
+    fn test_max_heap_with_left_subtree_unbalanced() {
+        let mut tree = Tree::with_root(10);
+        let last_id = tree.add_node(0, 10, true);
+        tree.add_node(last_id, 5, true);
+        let (is_max_heap, max_value) = tree.is_max_heap_with_max();
+
+        let mut output = String::new();
+        output.push_str("Function: test_max_heap_with_left_subtree_unbalanced\n");
+        output.push_str("==================================================\n");
+        output.push_str("Visualization URL: ");
+        output.push_str(&tree.get_visualization_url());
+        output.push_str("\n------------------------------\n");
+
+        println!("{}", output);
+
+        assert_eq!(is_max_heap, false);
+        assert_eq!(max_value, 10);
+    }
+
+    #[test]
+    fn test_max_heap_with_right_subtree_unbalanced() {
+        let mut tree = Tree::with_root(10);
+        let last_id = tree.add_node(0, 10, false);
+        tree.add_node(last_id, 5, false);
+        let (is_max_heap, max_value) = tree.is_max_heap_with_max();
+
+        let mut output = String::new();
+        output.push_str("Function: test_max_heap_with_right_subtree_unbalanced\n");
+        output.push_str("===================================================\n");
+        output.push_str("Visualization URL: ");
+        output.push_str(&tree.get_visualization_url());
+        output.push_str("\n------------------------------\n");
+
+        println!("{}", output);
+
+        assert_eq!(is_max_heap, false);
+        assert_eq!(max_value, 10);
+    }
+
+
+}
