@@ -313,7 +313,7 @@ mod tests {
 
         // CONFIGS
         // TODO: remove hardcoded configs and pass them as arguments
-        let folder_path = "testsets/handson2/"; // Specify the folder where the test files are located
+        let folder_path = "testsets/handson2-minmax/"; // Specify the folder where the test files are located
         let debug_print: bool = false; // Set to true to enable debug_print
         let number_of_tests = 10;
 
