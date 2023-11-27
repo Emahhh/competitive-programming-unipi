@@ -373,7 +373,8 @@ mod tests {
 
 
 
-// TODO: author
+/// # Author
+/// https://pages.di.unipi.it/rossano/blog/2023/fenwick/
 pub mod fenwick {
     #[derive(Debug)]
     pub struct FenwickTree {
@@ -446,6 +447,9 @@ pub mod fenwick {
 
 
 /// EXERCISE 2 (is_there)
+/// I used the fenwick tree implementation seen during the course.
+/// I used a similar approach as seen in another exercise to represent the segments.
+/// The is_there query is not optimal, amd should be optimized.
 pub mod ex_2_is_there {
     use crate::fenwick::FenwickTree;
 
@@ -475,7 +479,7 @@ pub mod ex_2_is_there {
         }
 
 
-
+        // TODO: optimize, maybe by using binary search
         pub fn is_there(&self, start_range: usize, end_range: usize, num_of_segments: usize) -> usize {
             for i in start_range..=end_range {
                 if self.tree.sum(i) == num_of_segments as i64 {
@@ -612,7 +616,7 @@ mod ex_2_tests {
                 results.push(result);
             }
 
-            println!("Tree {}: {:?}", i, exercise.tree_to_string());
+            // println!("Tree {}: {:?}", i, exercise.tree_to_string());
 
             // Assert the results match the expected output
             assert_eq!(results, expected_results, "Test files number {} failed!!!" , i);

@@ -9,6 +9,7 @@ authors = ["Emanuele Buonaccorsi"]
 [dependencies]
 urlencoding = "2.1.3"
 
+
 [[bin]]
 name = "util"
 path = "src/00_util.rs"
