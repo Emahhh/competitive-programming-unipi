@@ -463,15 +463,13 @@ pub mod ex_2_is_there {
         /// * `segments` - A vector containing couples that represent segments. Every couple contains indexes that represent the start and the end of the segment.
         pub fn new(n: usize,segments: &Vec<(usize, usize)>) -> Self {
 
-            let mut tree = fenwick::FenwickTree::with_len(n+1);
+            let mut tree = fenwick::FenwickTree::with_len(n*3);
 
             for (start, end) in segments.iter(){
-                tree.add(*end, -1);
+                let mut end_index = *end+1;
+                tree.add(end_index, -1);
                 tree.add(*start, 1);
             }
-
-            // Print the segment tree
-            println!("Segment tree:\n{}", tree.to_string());
 
             Self { tree }
         }
@@ -479,25 +477,13 @@ pub mod ex_2_is_there {
 
 
         pub fn is_there(&self, start_range: usize, end_range: usize, num_of_segments: usize) -> usize {
-            // Query the count of segments up to position end_range.
-            let count_end_range = self.tree.range_sum(0, end_range);
-        
-            // Query the count of segments up to position start_range-1.
-            let count_start_range_minus_1 = if start_range > 0 {
-                self.tree.range_sum(0, start_range - 1)
-            } else {
-                0
-            };
-        
-            // Calculate the count of segments in the range [start_range, end_range].
-            let count_range = count_end_range - count_start_range_minus_1;
-        
-            // Check if the count matches the required num_of_segments.
-            if count_range == num_of_segments as i64 {
-                1
-            } else {
-                0
+            for i in start_range..=end_range {
+                if self.tree.sum(i) == num_of_segments as i64 {
+                    return 1;
+                }
             }
+
+            return 0;
         }
         
     }
@@ -515,6 +501,12 @@ pub mod ex_2_is_there {
             return s;
         }
 
+    }
+
+    impl IsThereExercise {
+        pub fn tree_to_string(&self) -> String {
+            self.tree.to_string()
+        }
     }
 
 
@@ -620,8 +612,7 @@ mod ex_2_tests {
                 results.push(result);
             }
 
-            // Print or log results and details for debugging
-            // ...
+            println!("Tree {}: {:?}", i, exercise.tree_to_string());
 
             // Assert the results match the expected output
             assert_eq!(results, expected_results, "Test files number {} failed!!!" , i);
