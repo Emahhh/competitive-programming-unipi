@@ -27,10 +27,9 @@ pub mod ex_1_segment {
     // Constructor for the Segment Tree
     impl SegmentTree {
         pub fn new(size: usize) -> Self {
-            // Allocate space for a complete binary tree
-            // TODO: 2*size-1 nodes ????
-            let tree_size = 2 * (size+3) - 1;
-            let tree = vec![SegmentTreeNode { start: 0, end: 0, max_value:  std::i32::MIN};    tree_size];
+            // Allocate space for nodes
+            let tree_size = 2 * (size.next_power_of_two()) - 1;
+            let tree = vec![SegmentTreeNode { start: usize::MAX, end: usize::MAX, max_value:  std::i32::MIN};    tree_size];
             Self { tree }
         }
     }
@@ -111,7 +110,7 @@ pub mod ex_1_segment {
 
         /// Recursive function to query the segment tree for the maximum value in a range
         fn query_helper(&self, node: usize, query_start: usize, query_end: usize) -> i32 {
-            println!("query({}, {}, {})", node, query_start, query_end);
+            // println!("query({}, {}, {})", node, query_start, query_end);
             
             // Case 1: No overlap
             if query_end < self.tree[node].start || query_start > self.tree[node].end {
@@ -164,11 +163,29 @@ pub mod ex_1_segment {
 
         // Recursive function to update the segment tree
         fn update_helper(&mut self, node: usize, query_start: usize, query_end: usize, new_value: i32) {
+            // base case: out of range
+            if node > self.tree.len() - 1 {
+                return;
+            }
 
-            // Base case: I am in a leaf node that needs to be updated
-            if query_start <= self.tree[node].start && query_end >= self.tree[node].end {
-                let new_max = std::cmp::max(self.tree[node].max_value, new_value);
-                self.tree[node].max_value = new_max;
+            if query_start > self.tree.len() - 1 || query_end > self.tree.len() - 1 {
+                return;
+            }
+
+            if query_end < self.tree[node].start || query_start > self.tree[node].end {
+                return;
+            }
+
+
+            // Base case: I am in a leaf node
+            if 
+                self.tree[node].start == self.tree[node].end
+            {
+                // update the max value, if in the range of the query
+                if query_start <= self.tree[node].start && query_end >= self.tree[node].end {
+                    let new_min = std::cmp::min(self.tree[node].max_value, new_value);
+                    self.tree[node].max_value = new_min;
+                }
                 return;
             }
 
@@ -293,11 +310,17 @@ mod tests {
     #[test]
     fn test_segment_tree() {
         
+
+        // CONFIGS
+        // TODO: remove hardcoded configs and pass them as arguments
         let folder_path = "testsets/handson2/"; // Specify the folder where the test files are located
-        let debug_print: bool = true; // Set to true to enable debug_print
+        let debug_print: bool = false; // Set to true to enable debug_print
+        let number_of_tests = 10;
+
+
 
         // Attempt to find and run tests for any input and output file pairs
-        for i in 0..9 {
+        for i in 0..number_of_tests+1 {
             let input_file = format!("{}input{}.txt", folder_path , i);
             let output_file = format!("{}output{}.txt", folder_path ,  i);
 
@@ -343,7 +366,8 @@ mod tests {
 
 
             // Assert the results match the expected output
-            assert_eq!(results, expected_results);
+            assert_eq!(results, expected_results, "Test files number {} failed!!!" , i);
+            println!("Test files number {} passed!", i); 
         }
     }
 }
