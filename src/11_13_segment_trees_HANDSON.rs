@@ -6,6 +6,13 @@
 // https://pages.di.unipi.it/rossano/blog/2023/handson22324/
 
 
+fn main() {
+    println!("Hello, segment trees!");
+}
+
+
+
+/// EXERCISE 1
 pub mod ex_1_segment {
 
 
@@ -240,16 +247,10 @@ pub mod ex_1_segment {
 
 
 
-fn main() {
-    println!("Hello, segment trees!");
-}
 
 
 
-
-
-
-// Test function
+// TESTS FOR EXERCISE 1
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -266,13 +267,6 @@ mod tests {
         let lines = io::BufReader::new(file).lines();
 
         let mut iter = lines.map(|line| line.unwrap());
-
-        let _nm: Vec<usize> = iter
-            .next()
-            .unwrap()
-            .split_whitespace()
-            .map(|s| s.parse().unwrap())
-            .collect();
 
         let array: Vec<i32> = iter
             .next()
@@ -372,3 +366,17 @@ mod tests {
     }
 }
 
+
+
+
+
+
+
+
+
+
+/// EXERCISE 2 (is_there)
+pub mod ex_2_is_there {
+    
+
+}
