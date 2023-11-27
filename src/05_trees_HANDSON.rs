@@ -1,4 +1,7 @@
 #![allow(dead_code)]
+#![allow(clippy::needless_return)]
+#![allow(clippy::bool_comparison)]
+#![allow(clippy::bool_assert_comparison)]
 
 //! # Hands-On 1 -Tree Traversals
 //! This is the first hands-on of the course, consisting of 3 exercises.
@@ -183,10 +186,10 @@ mod visualizer {
             let mut output = String::new();
             output.push_str("=================================\n");
             output.push_str(additional_text);
-            output.push_str("\n");
+            output.push('\n');
             output.push_str("Put this URL inside a browser to view the tree:\n");
             output.push_str(&self.get_visualization_url());
-            output.push_str("\n");
+            output.push('\n');
             output.push_str("=================================\n");
             println!("{}", output);
         }
@@ -355,6 +358,7 @@ mod ex_1_tests {
 /// /// # Pseudocode:
 ///
 /// ```
+/// #[cfg(doctest)]
 /// is_balanced(node) -> (bool, int) {
 ///     if node is None {
 ///         return (True, 0)
