@@ -2,6 +2,7 @@
 #![allow(clippy::needless_return)]
 #![allow(clippy::bool_comparison)]
 #![allow(clippy::bool_assert_comparison)]
+#![allow(clippy::items_after_test_module)]
 
 // https://pages.di.unipi.it/rossano/blog/2023/handson22324/
 
@@ -393,7 +394,7 @@ pub mod fenwick {
         /// Indexing is 0-based, even if internally we use 1-based indexing
         pub fn add(&mut self, i: usize, delta: i64) {
             let mut i = i + 1; 
-            assert!(i < self.tree.len());
+            assert!(i < self.tree.len(), "Index out of bounds. Tried to add {} to index {}, but tree length is {}", delta, i, self.tree.len());
     
             while i < self.tree.len() {
                 self.tree[i] += delta;
@@ -434,6 +435,10 @@ pub mod fenwick {
         fn next_sibling(i: usize) -> usize {
             i + Self::isolate_trailing_one(i)
         }
+
+
+
+
     }
 }
 
@@ -442,8 +447,185 @@ pub mod fenwick {
 
 /// EXERCISE 2 (is_there)
 pub mod ex_2_is_there {
+    use crate::fenwick::FenwickTree;
 
-    
+    use super::fenwick;
+
+    pub struct IsThereExercise {
+        tree: fenwick::FenwickTree
+    }
+
+    impl IsThereExercise {
+
+        /// Create a new IsThereExercise
+        /// # Arguments 
+        /// * `n` - The maximum length of a segment, that also equals the number of segments
+        /// * `segments` - A vector containing couples that represent segments. Every couple contains indexes that represent the start and the end of the segment.
+        pub fn new(n: usize,segments: &Vec<(usize, usize)>) -> Self {
+
+            let mut tree = fenwick::FenwickTree::with_len(n+1);
+
+            for (start, end) in segments.iter(){
+                tree.add(*end, -1);
+                tree.add(*start, 1);
+            }
+
+            // Print the segment tree
+            println!("Segment tree:\n{}", tree.to_string());
+
+            Self { tree }
+        }
 
 
+
+        pub fn is_there(&self, start_range: usize, end_range: usize, num_of_segments: usize) -> usize {
+            // Query the count of segments up to position end_range.
+            let count_end_range = self.tree.range_sum(0, end_range);
+        
+            // Query the count of segments up to position start_range-1.
+            let count_start_range_minus_1 = if start_range > 0 {
+                self.tree.range_sum(0, start_range - 1)
+            } else {
+                0
+            };
+        
+            // Calculate the count of segments in the range [start_range, end_range].
+            let count_range = count_end_range - count_start_range_minus_1;
+        
+            // Check if the count matches the required num_of_segments.
+            if count_range == num_of_segments as i64 {
+                1
+            } else {
+                0
+            }
+        }
+        
+    }
+
+
+    impl FenwickTree {
+
+        pub fn to_string(&self) -> String {
+            let mut s = String::new();
+            
+            for i in 0..self.len() {
+                s.push_str( &format!("{:?} ", self.sum(i)) );
+            }
+
+            return s;
+        }
+
+    }
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+// TESTS FOR IsThereExercise
+#[cfg(test)]
+mod ex_2_tests {
+    use super::ex_2_is_there::IsThereExercise;
+    use std::fs::File;
+    use std::io::{self, BufRead};
+    use std::path::Path;
+
+    // Function to read input from a file and return a tuple (usize, Vec<(usize, usize)>, Vec<(usize, usize, usize)>)
+    fn read_input(file_path: &str) -> (usize, Vec<(usize, usize)>, Vec<(usize, usize, usize)>) {
+        let path = Path::new(file_path);
+        let err_msg = format!("Failed to open file with complete path '{}'", file_path);
+        let file = File::open(&path).expect(&err_msg);
+        let lines = io::BufReader::new(file).lines().map(|line| line.unwrap()).collect::<Vec<_>>();
+
+        let iter = lines.iter().cloned();
+
+        let n_m: Vec<usize> = iter
+            .clone()
+            .next()
+            .unwrap()
+            .split_whitespace()
+            .map(|s| s.parse().unwrap())
+            .collect();
+
+        let n = n_m[0];
+        let m = n_m[1];
+
+        let segments: Vec<(usize, usize)> = iter
+            .clone()
+            .skip(1)
+            .take(n)
+            .map(|line| {
+                let values: Vec<usize> = line.split_whitespace().map(|s| s.parse().unwrap()).collect();
+                (values[0], values[1])
+            })
+            .collect();
+
+        let queries: Vec<(usize, usize, usize)> = iter
+            .skip(1 + n)
+            .take(m)
+            .map(|line| {
+                let values: Vec<usize> = line.split_whitespace().map(|s| s.parse().unwrap()).collect();
+                (values[0], values[1], values[2])
+            })
+            .collect();
+
+        (m, segments, queries)
+    }
+
+    // Function to read output from a file and return a Vec<usize>
+    fn read_output(file_path: &str) -> Vec<usize> {
+        let path = Path::new(file_path);
+        let file = File::open(&path).expect("Failed to open file");
+        let lines = io::BufReader::new(file).lines();
+
+        lines
+            .map(|line| line.unwrap().parse().unwrap())
+            .collect()
+    }
+
+
+
+
+
+
+    #[test]
+    fn test_is_there() {
+        // CONFIGS
+        let folder_path = "testsets/handson2-isthere/";
+        let number_of_tests = 7;
+
+        for i in 0..number_of_tests + 1 {
+            let input_file = format!("{}input{}.txt", folder_path, i);
+            let output_file = format!("{}output{}.txt", folder_path, i);
+
+            // Read input and output from files
+            let (m, segments, queries) = read_input(&input_file);
+            let expected_results = read_output(&output_file);
+
+            // Create a new IsThereExercise
+            let exercise = IsThereExercise::new(m, &segments);
+
+            // Perform queries and collect results
+            let mut results = Vec::new();
+            for query in queries {
+                let result = exercise.is_there(query.0, query.1, query.2);
+                results.push(result);
+            }
+
+            // Print or log results and details for debugging
+            // ...
+
+            // Assert the results match the expected output
+            assert_eq!(results, expected_results, "Test files number {} failed!!!" , i);
+            println!("Test files number {} passed!", i);
+        }
+    }
 }
