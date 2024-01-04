@@ -23,13 +23,20 @@ pub mod holiday_planning {
 
     impl Problem {
 
-        pub fn new(cities: usize, days: usize, itineraries: Vec<Vec<usize>>) -> Self {
+        pub fn new(cities: usize, days: usize) -> Self {
             Self { 
                 cities, 
                 days, 
-                itineraries, 
+                itineraries: vec![vec![0; days+1]; cities+1],
                 subproblems_table: vec![vec![0; days+1]; cities+1], 
             }
+        }
+
+        pub fn set_itinerary(&mut self, city: usize, day: usize, value: usize) {
+            if city == 0 {
+                panic!("City id cannot be 0! It must start from 1"); // TODO: do it automatically usign  a vec as a parameter
+            }
+            self.itineraries[city][day] = value
         }
 
         /// returns the number of attractions you can visit in `city` at the `day` day
@@ -38,20 +45,43 @@ pub mod holiday_planning {
         }
 
         /// Helper method to get a solution from the table
+        /// # Returns
+        /// The number of attractions you can visit with `cities_available` cities and `days_available` days
         fn get_solution(&self, cities_available: usize, days_available: usize) -> usize {
             self.subproblems_table[cities_available][days_available]
         }
 
         /// Helper ethod to set a solution in the table
-        fn set_solution(&mut self, cities_available: usize, days_available: usize, solution: usize) {
-            self.subproblems_table[cities_available][days_available] = solution
+        /// # Arguments
+        /// - cities_available: number of cities available
+        /// - days_available: number of days available
+        /// - attractions_num: number of attractions you can visit
+        fn set_solution(&mut self, cities_available: usize, days_available: usize, attractions_num: usize) {
+            self.subproblems_table[cities_available][days_available] = attractions_num
         }
 
         /// Method to solve the problem
         /// Returns the number of attractions you can visit, respecting the constraints of the problem
         pub fn solve(&mut self) -> usize {
-            
-            
+
+            // filling the first row and column with 0
+            for i in 0..=self.days {
+                self.set_solution(0, i, 0);
+            }
+
+            for i in 0..=self.cities {
+                self.set_solution(i, 0, 0);
+            }
+
+
+            for i in 1..=self.cities {
+                for j in 1..=self.days {
+                    // TODO: go on
+                    self.set_solution();
+                }
+            }
+
+            return 0;
         }
     }
 }
