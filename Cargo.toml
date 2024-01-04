@@ -34,3 +34,7 @@ path = "src/05_trees_HANDSON.rs"
 [[bin]]
 name = "segment_trees_handson"
 path = "src/11_13_segment_trees_HANDSON.rs"
+
+[[bin]]
+name = "dp_handson"
+path = "src/99_DP_HANDSON.rs"
