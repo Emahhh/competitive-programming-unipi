@@ -32,11 +32,8 @@ pub mod holiday_planning {
             }
         }
 
-        pub fn set_itinerary(&mut self, city: usize, day: usize, value: usize) {
-            if city == 0 {
-                panic!("City id cannot be 0! It must start from 1"); // TODO: do it automatically usign  a vec as a parameter
-            }
-            self.itineraries[city][day] = value
+        pub fn set_itinerary(&mut self, itinerary: Vec<usize>) {
+            self.itineraries.push(itinerary);
         }
 
         /// returns the number of attractions you can visit in `city` at the `day` day
@@ -95,3 +92,6 @@ pub mod holiday_planning {
         }
     }
 }
+
+
+
