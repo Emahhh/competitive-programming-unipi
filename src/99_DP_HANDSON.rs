@@ -74,14 +74,24 @@ pub mod holiday_planning {
             }
 
 
-            for i in 1..=self.cities {
-                for j in 1..=self.days {
-                    // TODO: go on
-                    self.set_solution();
+            for city in 1..=self.cities {
+                for day in 1..=self.days {
+
+                    let mut candidates: Vec<usize> = Vec::new();
+
+                    candidates.push(self.get_solution(city-1, day)); // cell above (same days, but we do not pick the current city at all)
+
+                    for day_pointer in 1..=day {
+                        candidates.push(self.get_solution(city-1, day - day_pointer) + self.get_solution(city, day_pointer))
+                    }
+
+                    let solution: usize = *candidates.iter().max().unwrap();
+
+                    self.set_solution(city, day, solution);
                 }
             }
 
-            return 0;
+            return self.get_solution(self.cities, self.days);
         }
     }
 }
