@@ -268,25 +268,24 @@ pub mod course {
                     // we check if there is a mach (we found the same topic, hence the same id)
                     let is_same_topic = topics_sorted_beauty[i - 1].id == topics_sorted_difficulty[j - 1].id;
                     
-                    // if so, we also have to make sure that the order is increasing (just equal is not enough)
-                    let is_initial_cell = i <= 1 || j <= 1;
-                    let mut is_increasing_order: bool = false;
-
-                    if is_initial_cell { //to avid index out of bounds
-                        is_increasing_order = true;
-                    } else {
+                    // if there is a match, we also have to make sure that the order is increasing
+                    if is_same_topic {
+                        // TODO: to check if increasing, store the courses i'm taking! omfg
+                        
                         let is_beauty_increasing = topics_sorted_beauty[i - 1].beauty > topics_sorted_difficulty[j - 2].beauty;
                         let is_difficulty_increasing = topics_sorted_beauty[i - 1].difficulty > topics_sorted_difficulty[j - 2].difficulty;
-                        is_increasing_order = is_beauty_increasing && is_difficulty_increasing;
-                    }
-            
-                    let is_valid_selection = is_same_topic && is_increasing_order;
-            
-                    if is_valid_selection {
-                        mat[i][j] = mat[i - 1][j - 1] + 1;
+
+                        if is_beauty_increasing && is_difficulty_increasing {
+                            mat[i][j] = mat[i - 1][j - 1] + 1;
+                        } else {
+                            mat[i][j] = std::cmp::max(mat[i - 1][j], mat[i][j - 1]);
+                        }
                     } else {
+                        // No match, continue with the regular LCS algorithm
                         mat[i][j] = std::cmp::max(mat[i - 1][j], mat[i][j - 1]);
                     }
+
+
                 }
             }
             
