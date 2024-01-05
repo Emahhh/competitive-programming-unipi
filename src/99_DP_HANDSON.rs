@@ -3,6 +3,8 @@
 
 
 
+
+
 fn main() {
     println!("Hello, dynamic programming!");
 }
@@ -229,6 +231,44 @@ mod tests {
 /// objective is to select the maximum number of topics for his upcoming course.
 pub mod course {
 
+    use super::DEBUG;
+
+
+    pub struct CourseProblem {
+        /// Number of topics (n)
+        topics_num: usize,
+
+        topics: Vec<Topic>,
+    }
+
+    #[derive(Debug, Clone, Copy)]
+    pub struct Topic {
+        index: usize,
+        beauty: usize,
+        difficulty: usize,
+    }
+
+
+    impl CourseProblem {
+        pub fn new(topics_num: usize, topics: Vec<Topic>) -> Self {
+            Self {
+                topics_num,
+                topics: topics,
+            }
+        }
+
+        pub fn solve(&self) -> usize {
+            // order two copies of the topics: one by beauty and one by difficulty
+
+            // find the LCS
+
+            return 0;
+        }
+
+    }
+
+
+
 }
 
 
@@ -255,3 +295,5 @@ mod tests2 {
     use super::course::*;
     use std::fs;
 }
+
+
