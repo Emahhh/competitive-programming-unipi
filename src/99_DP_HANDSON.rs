@@ -13,6 +13,8 @@ const TESTS_FOLDER: &str = "testsets/handson3-holiday/";
 
 // https://pages.di.unipi.it/rossano/blog/2023/handson32324/
 
+
+/// EXERCISE 1
 pub mod holiday_planning {
     use super::DEBUG;
 
@@ -211,4 +213,45 @@ mod tests {
     }
 
 
+}
+
+
+//----------------------
+
+
+
+
+/// EXERCISE 2
+/// A professor has to prepare a new course.
+/// he knows the beauty b_i and the difficulty d_i of each topic i.
+/// students appreciate a course only if each lecture is more beautiful than the previous one.
+/// the topics must exhibit increasing levels of difficulty.
+/// objective is to select the maximum number of topics for his upcoming course.
+pub mod course {
+
+}
+
+
+/// # Tests for EXERCISE 2
+///
+/// # Input
+/// The first line contains n. Each of the next n lines contains the beuaty b and the difficulty d, one for each topic.
+///
+/// Example:
+/// ```
+/// 5      // n
+/// 0 3    // beauty 0 and difficulty 3. Write me an email if you know what this topic is.
+/// 99 1   // Fenwick tree?
+/// 11 20
+/// 1 2
+/// 10 5
+/// ````
+///
+/// # Output
+/// The output files contains the largest number of selected topics.
+#[cfg(test)]
+mod tests2 {
+    use super::*;
+    use super::course::*;
+    use std::fs;
 }
