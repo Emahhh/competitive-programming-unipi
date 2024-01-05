@@ -1,10 +1,13 @@
-// https://pages.di.unipi.it/rossano/blog/2023/handson32324/
-
 fn main() {
     println!("Hello, dynamic programming!");
 }
 
+const DEBUG: bool = true;
+
+// https://pages.di.unipi.it/rossano/blog/2023/handson32324/
+
 pub mod holiday_planning {
+    use super::DEBUG;
 
     pub struct Problem {
         /// Number of cities visitable (n)
@@ -14,21 +17,19 @@ pub mod holiday_planning {
         days: usize,
 
         /// itineraries[i][j] is the number of attractions you can visit in city i on day j
-        itineraries: Vec<Vec<usize>>, 
+        itineraries: Vec<Vec<usize>>,
 
         /// subproblems[i][j] is the number of attractions you can visit with i cities available and j days available
         subproblems_table: Vec<Vec<usize>>,
     }
 
-
     impl Problem {
-
         pub fn new(cities: usize, days: usize) -> Self {
-            Self { 
-                cities, 
-                days, 
-                itineraries: vec![vec![0; days+1]; cities+1],
-                subproblems_table: vec![vec![0; days+1]; cities+1], 
+            Self {
+                cities,
+                days,
+                itineraries: vec![],
+                subproblems_table: vec![vec![0; days + 1]; cities + 1],
             }
         }
 
@@ -53,14 +54,24 @@ pub mod holiday_planning {
         /// - cities_available: number of cities available
         /// - days_available: number of days available
         /// - attractions_num: number of attractions you can visit
-        fn set_solution(&mut self, cities_available: usize, days_available: usize, attractions_num: usize) {
+        fn set_solution(
+            &mut self,
+            cities_available: usize,
+            days_available: usize,
+            attractions_num: usize,
+        ) {
+            if DEBUG {
+                println!(
+                    "set_solution({}, {}, {})",
+                    cities_available, days_available, attractions_num
+                )
+            }
             self.subproblems_table[cities_available][days_available] = attractions_num
         }
 
         /// Method to solve the problem
         /// Returns the number of attractions you can visit, respecting the constraints of the problem
         pub fn solve(&mut self) -> usize {
-
             // filling the first row and column with 0
             for i in 0..=self.days {
                 self.set_solution(0, i, 0);
@@ -70,18 +81,25 @@ pub mod holiday_planning {
                 self.set_solution(i, 0, 0);
             }
 
-
-            for city in 1..=self.cities {
-                for day in 1..=self.days {
-
+            for city in 1..self.cities {
+                for day in 1..self.days {
                     let mut candidates: Vec<usize> = Vec::new();
 
-                    candidates.push(self.get_solution(city-1, day)); // cell above (same days, but we do not pick the current city at all)
+                    candidates.push(self.get_solution(city - 1, day)); // cell above (same amount of days, but we do not pick the current city at all)
 
-                    for day_pointer in 1..=day {
-                        candidates.push(self.get_solution(city-1, day - day_pointer) + self.get_solution(city, day_pointer))
+                    // we also have the options where we pick the current city
+                    // we have different options: we can pick the city for 1 day, 2 days, 3 days, etc.
+                    // the remaining days are going to be spent in other cities (we already have the solutions in the row above)
+                    for day_pointer in 1..day {
+                        candidates.push(
+                            self.get_solution(city - 1, day - day_pointer) // the best itinerary spent in other cities
+                            + self.get_solution(city, day_pointer - 1) // the itinerary spent in the current city, but in less days TODO: maybe should be a counter
+                            +  self.get_itinerary(city, day_pointer)    // the itinerary spent in the current city, just for the current day
+                        )
                     }
 
+                    // print candidates
+                    println!("{:?}", candidates);
                     let solution: usize = *candidates.iter().max().unwrap();
 
                     self.set_solution(city, day, solution);
@@ -90,8 +108,100 @@ pub mod holiday_planning {
 
             return self.get_solution(self.cities, self.days);
         }
+
+        pub fn print_subproblems_table(&self) {
+            let mut str = String::from("subproblems:\n");
+
+            for i in 0..=self.cities {
+                str.push_str(&format!("{:?}\n", self.subproblems_table[i]));
+            }
+            println!("{}", str);
+        }
+
+        pub fn print_itineraries(&self) {
+            let mut str = String::from("itineraries:\n");
+            for i in 0..self.cities {
+                str.push_str(&format!("{:?}\n", self.itineraries[i]));
+            }
+            println!("{}", str);
+        }
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::DEBUG;
+    use super::holiday_planning::Problem;
+    use std::fs;
+
+    fn read_input(filename: &str) -> (usize, usize, Vec<Vec<usize>>) {
+        let contents = fs::read_to_string(filename).expect("Failed to read file");
+        let mut lines = contents.lines();
+        let (cities, days) = {
+            let mut split = lines.next().unwrap().split_whitespace();
+            (
+                split.next().unwrap().parse().unwrap(),
+                split.next().unwrap().parse().unwrap(),
+            )
+        };
+
+        let itineraries: Vec<Vec<usize>> = lines
+            .map(|line| {
+                line.split_whitespace()
+                    .map(|x| x.parse().unwrap())
+                    .collect()
+            })
+            .collect();
+
+        if (DEBUG){
+            let mut str = String::from("itineraries from file:\n");
+            for i in 0..cities {
+                str.push_str(&format!("{:?}\n", itineraries[i]));
+            }
+            str.push_str(&format!("cities: {}, days: {}\n", cities, days));
+            println!("{}", str);
+        }
+
+        (cities, days, itineraries)
+    }
+
+    fn read_output(filename: &str) -> usize {
+        fs::read_to_string(filename)
+            .expect("Failed to read file")
+            .trim()
+            .parse()
+            .expect("Failed to parse output")
+    }
+
+    #[test]
+    fn test_example_input_0() {
+        let folder = "testsets/handson3-holiday/";
+
+        let input_filename = format!("{}{}", folder, "input0.txt");
+        let (cities, days, itineraries) = read_input(&input_filename);
+
+        let expected_output_filename = format!("{}{}", folder, "output0.txt");
+        let expected_output = read_output(&expected_output_filename);
+
+        let mut problem = Problem::new(cities, days);
+        for itinerary in itineraries {
+            problem.set_itinerary(itinerary);
+        }
+
+        let result = problem.solve();
+
+        if DEBUG {
+            // print itineraries
+            problem.print_itineraries();
+
+            // print subproblems table
+            problem.print_subproblems_table();
+
+            println!("result: {}", result);
+        }
+
+        assert_eq!(result, expected_output);
+    }
 
 
+}
