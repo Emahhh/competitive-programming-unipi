@@ -267,27 +267,27 @@ pub mod course {
                 for j in 1..cols {
                     // we check if there is a mach (we found the same topic, hence the same id)
                     let is_same_topic = topics_sorted_beauty[i - 1].id == topics_sorted_difficulty[j - 1].id;
-                    
-                    // if there is a match, we also have to make sure that the order is increasing
+
                     if is_same_topic {
-                        // TODO: to check if increasing, store the courses i'm taking! omfg
-                        
-                        let is_beauty_increasing = topics_sorted_beauty[i - 1].beauty > topics_sorted_difficulty[j - 2].beauty;
-                        let is_difficulty_increasing = topics_sorted_beauty[i - 1].difficulty > topics_sorted_difficulty[j - 2].difficulty;
+                        // if there is a match, we also have to make sure that the order is increasing
+                        // i.e. that the beaury and diff of the current topic is greater than the previous selected
+                        let current_topic = topics_sorted_beauty[i - 1];
+                        let last_selected = get_last_selected(&topics_sorted_difficulty, i, j);
+
+                        let is_beauty_increasing = current_topic.beauty > last_selected.beauty;
+                        let is_difficulty_increasing = current_topic.difficulty > last_selected.difficulty;
 
                         if is_beauty_increasing && is_difficulty_increasing {
                             mat[i][j] = mat[i - 1][j - 1] + 1;
-                        } else {
-                            mat[i][j] = std::cmp::max(mat[i - 1][j], mat[i][j - 1]);
                         }
+
                     } else {
                         // No match, continue with the regular LCS algorithm
                         mat[i][j] = std::cmp::max(mat[i - 1][j], mat[i][j - 1]);
                     }
-
-
                 }
             }
+            
             
                 
 
