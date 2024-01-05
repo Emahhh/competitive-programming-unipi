@@ -1,8 +1,14 @@
+#![allow(unused_imports)]
+#![allow(unused_parens)]
+
+
+
 fn main() {
     println!("Hello, dynamic programming!");
 }
 
-const DEBUG: bool = true;
+/* trunk-ignore(clippy/dead_code) */
+const DEBUG: bool = false;
 
 // https://pages.di.unipi.it/rossano/blog/2023/handson32324/
 
