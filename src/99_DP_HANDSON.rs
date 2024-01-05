@@ -39,7 +39,7 @@ pub mod holiday_planning {
 
         /// returns the number of attractions you can visit in `city` at the `day` day
         pub fn get_itinerary(&self, city: usize, day: usize) -> usize {
-            self.itineraries[city-1][day] // -1 because the cities start at 1 in the table
+            self.itineraries[city-1][day-1] // -1 because the cities start at 1 in the table
         }
 
         /// Helper method to get a solution from the table
@@ -60,12 +60,6 @@ pub mod holiday_planning {
             days_available: usize,
             attractions_num: usize,
         ) {
-            if DEBUG {
-                println!(
-                    "set_solution({}, {}, {})",
-                    cities_available, days_available, attractions_num
-                )
-            }
             self.subproblems_table[cities_available][days_available] = attractions_num
         }
 
@@ -87,19 +81,19 @@ pub mod holiday_planning {
 
                     candidates.push(self.get_solution(city - 1, day)); // cell above (same amount of days, but we do not pick the current city at all)
 
+
                     // we also have the options where we pick the current city
                     // we have different options: we can pick the city for 1 day, 2 days, 3 days, etc.
                     // the remaining days are going to be spent in other cities (we already have the solutions in the row above)
-                    for day_pointer in 1..day {
+                    let mut attractions_streak : usize = 0; // accumulates the number of attractions visited in the current city
+                    for day_pointer in 1..=day {
+                        attractions_streak += self.get_itinerary(city, day_pointer);
                         candidates.push(
                             self.get_solution(city - 1, day - day_pointer) // the best itinerary spent in other cities
-                            + self.get_solution(city, day_pointer - 1) // the itinerary spent in the current city, but in less days TODO: maybe should be a counter
-                            +  self.get_itinerary(city, day_pointer)    // the itinerary spent in the current city, just for the current day
+                            + attractions_streak
                         )
                     }
 
-                    // print candidates
-                    println!("{:?}", candidates);
                     let solution: usize = *candidates.iter().max().unwrap();
 
                     self.set_solution(city, day, solution);
