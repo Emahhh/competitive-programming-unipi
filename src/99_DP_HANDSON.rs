@@ -265,13 +265,32 @@ pub mod course {
 
             for i in 1..rows {
                 for j in 1..cols {
-                    if topics_sorted_beauty[i-1].id == topics_sorted_difficulty[j-1].id {
+                    // we check if there is a mach (we found the same topic, hence the same id)
+                    let is_same_topic = topics_sorted_beauty[i - 1].id == topics_sorted_difficulty[j - 1].id;
+                    
+                    // if so, we also9 have to check that the order is increasing (just equal is not enough)
+                    let is_initial_cell = i <= 1 || j <= 1;
+                    let is_increasing_order: bool;
+
+                    if !is_initial_cell {
+                        let is_beauty_increasing = topics_sorted_beauty[i - 1].beauty > topics_sorted_difficulty[j - 2].beauty;
+                        let is_difficulty_increasing = topics_sorted_beauty[i - 1].difficulty > topics_sorted_difficulty[j - 2].difficulty;
+                        is_increasing_order = is_beauty_increasing && is_difficulty_increasing;
+                    } else {
+                        is_increasing_order = true;
+                    }
+            
+                    let is_valid_selection = is_same_topic && is_increasing_order;
+            
+                    if is_valid_selection {
                         mat[i][j] = mat[i - 1][j - 1] + 1;
                     } else {
                         mat[i][j] = std::cmp::max(mat[i - 1][j], mat[i][j - 1]);
                     }
                 }
-            }            
+            }
+            
+                
 
             if DEBUG {
                 println!("mat:\n{:?}", mat);
@@ -313,17 +332,18 @@ mod tests2 {
         let mut id_counter: usize = 0;
 
         let topics: Vec<Topic> = lines
-            .map(|line| {
-                let mut split = line.split_whitespace();
-                let my_topic = Topic {
-                    id: id_counter,
-                    beauty: split.next().unwrap().parse().unwrap(),
-                    difficulty: split.next().unwrap().parse().unwrap(),
-                };
-                id_counter += 1;
-                return my_topic;
-            })
-            .collect();
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| {
+            let mut split = line.split_whitespace();
+            let my_topic = Topic {
+                id: id_counter,
+                beauty: split.next().unwrap().parse().unwrap(),
+                difficulty: split.next().unwrap().parse().unwrap(),
+            };
+            id_counter += 1;
+            my_topic
+        })
+        .collect();
 
         (topics_num, topics)
     }
