@@ -272,12 +272,12 @@ pub mod course {
                     let is_initial_cell = i <= 1 || j <= 1;
                     let is_increasing_order: bool;
 
-                    if !is_initial_cell {
+                    if is_initial_cell { //to avid index out of bounds
+                        is_increasing_order = true;
+                    } else {
                         let is_beauty_increasing = topics_sorted_beauty[i - 1].beauty > topics_sorted_difficulty[j - 2].beauty;
                         let is_difficulty_increasing = topics_sorted_beauty[i - 1].difficulty > topics_sorted_difficulty[j - 2].difficulty;
                         is_increasing_order = is_beauty_increasing && is_difficulty_increasing;
-                    } else {
-                        is_increasing_order = true;
                     }
             
                     let is_valid_selection = is_same_topic && is_increasing_order;
