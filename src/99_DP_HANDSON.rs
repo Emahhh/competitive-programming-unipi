@@ -268,9 +268,9 @@ pub mod course {
                     // we check if there is a mach (we found the same topic, hence the same id)
                     let is_same_topic = topics_sorted_beauty[i - 1].id == topics_sorted_difficulty[j - 1].id;
                     
-                    // if so, we also9 have to check that the order is increasing (just equal is not enough)
+                    // if so, we also have to make sure that the order is increasing (just equal is not enough)
                     let is_initial_cell = i <= 1 || j <= 1;
-                    let is_increasing_order: bool;
+                    let mut is_increasing_order: bool = false;
 
                     if is_initial_cell { //to avid index out of bounds
                         is_increasing_order = true;
@@ -362,6 +362,9 @@ mod tests2 {
         let tests_num = 7;
 
         for i in 0..=tests_num {
+            // if i == 3 || i == 4 || i == 5 || i == 6 {
+            //     continue;
+            // }
             let input_filename = format!("{}/input{}.txt", folder, i);
             let (topics_num, topics) = read_input(&input_filename);
             let expected_output_filename = format!("{}/output{}.txt", folder, i);
