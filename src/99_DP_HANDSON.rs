@@ -9,6 +9,7 @@ fn main() {
 
 /* trunk-ignore(clippy/dead_code) */
 const DEBUG: bool = false;
+const TESTS_FOLDER: &str = "testsets/handson3-holiday/";
 
 // https://pages.di.unipi.it/rossano/blog/2023/handson32324/
 
@@ -130,7 +131,7 @@ pub mod holiday_planning {
 
 #[cfg(test)]
 mod tests {
-    use super::DEBUG;
+    use super::*;
     use super::holiday_planning::Problem;
     use std::fs;
 
@@ -173,34 +174,40 @@ mod tests {
             .expect("Failed to parse output")
     }
 
+
     #[test]
-    fn test_example_input_0() {
-        let folder = "testsets/handson3-holiday/";
+    fn test_range() {
+        let folder = TESTS_FOLDER;
+        let tests_num = 4;
 
-        let input_filename = format!("{}{}", folder, "input0.txt");
-        let (cities, days, itineraries) = read_input(&input_filename);
+        for i in 0..=tests_num {
+            let input_filename = format!("{}{}", folder, format!("input{}.txt", i));
+            let (cities, days, itineraries) = read_input(&input_filename);
+            let expected_output_filename = format!("{}{}", folder, format!("output{}.txt", i));
+            let expected_output = read_output(&expected_output_filename);
 
-        let expected_output_filename = format!("{}{}", folder, "output0.txt");
-        let expected_output = read_output(&expected_output_filename);
+            let mut problem = Problem::new(cities, days);
+            for itinerary in itineraries {
+                problem.set_itinerary(itinerary);
+            }
 
-        let mut problem = Problem::new(cities, days);
-        for itinerary in itineraries {
-            problem.set_itinerary(itinerary);
+            let result = problem.solve();
+
+            if DEBUG {
+                // print itineraries
+                problem.print_itineraries();
+
+                // print subproblems table
+                problem.print_subproblems_table();
+
+                println!("result: {}", result);
+            }
+
+            assert_eq!(result, expected_output);
+            println!("Test file number {} passed!", i);
         }
 
-        let result = problem.solve();
-
-        if DEBUG {
-            // print itineraries
-            problem.print_itineraries();
-
-            // print subproblems table
-            problem.print_subproblems_table();
-
-            println!("result: {}", result);
-        }
-
-        assert_eq!(result, expected_output);
+        print!("All {} tests passed!\n", tests_num);
     }
 
 
