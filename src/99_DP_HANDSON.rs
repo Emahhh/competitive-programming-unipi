@@ -1,10 +1,6 @@
 #![allow(unused_imports)]
 #![allow(unused_parens)]
 
-
-
-
-
 fn main() {
     println!("Hello, dynamic programming!");
 }
@@ -14,7 +10,6 @@ const DEBUG: bool = false;
 const TESTS_FOLDER: &str = "testsets/handson3-holiday/";
 
 // https://pages.di.unipi.it/rossano/blog/2023/handson32324/
-
 
 /// EXERCISE 1
 pub mod holiday_planning {
@@ -50,7 +45,7 @@ pub mod holiday_planning {
 
         /// returns the number of attractions you can visit in `city` at the `day` day
         pub fn get_itinerary(&self, city: usize, day: usize) -> usize {
-            self.itineraries[city-1][day-1] // -1 because the cities start at 1 in the table
+            self.itineraries[city - 1][day - 1] // -1 because the cities start at 1 in the table
         }
 
         /// Helper method to get a solution from the table
@@ -92,16 +87,15 @@ pub mod holiday_planning {
 
                     candidates.push(self.get_solution(city - 1, day)); // cell above (same amount of days, but we do not pick the current city at all)
 
-
                     // we also have the options where we pick the current city
                     // we have different options: we can pick the city for 1 day, 2 days, 3 days, etc.
                     // the remaining days are going to be spent in other cities (we already have the solutions in the row above)
-                    let mut attractions_streak : usize = 0; // accumulates the number of attractions visited in the current city
+                    let mut attractions_streak: usize = 0; // accumulates the number of attractions visited in the current city
                     for day_pointer in 1..=day {
                         attractions_streak += self.get_itinerary(city, day_pointer);
                         candidates.push(
                             self.get_solution(city - 1, day - day_pointer) // the best itinerary spent in other cities
-                            + attractions_streak
+                            + attractions_streak,
                         )
                     }
 
@@ -134,9 +128,9 @@ pub mod holiday_planning {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
+mod tests1 {
     use super::holiday_planning::Problem;
+    use super::*;
     use std::fs;
 
     fn read_input(filename: &str) -> (usize, usize, Vec<Vec<usize>>) {
@@ -158,7 +152,7 @@ mod tests {
             })
             .collect();
 
-        if (DEBUG){
+        if (DEBUG) {
             let mut str = String::from("itineraries from file:\n");
             for i in 0..cities {
                 str.push_str(&format!("{:?}\n", itineraries[i]));
@@ -178,9 +172,8 @@ mod tests {
             .expect("Failed to parse output")
     }
 
-
     #[test]
-    fn test_range() {
+    fn test1_range() {
         let folder = TESTS_FOLDER;
         let tests_num = 4;
 
@@ -213,15 +206,9 @@ mod tests {
 
         print!("All {} tests passed!\n", tests_num);
     }
-
-
 }
 
-
 //----------------------
-
-
-
 
 /// EXERCISE 2
 /// A professor has to prepare a new course.
@@ -233,7 +220,6 @@ pub mod course {
 
     use super::DEBUG;
 
-
     pub struct CourseProblem {
         /// Number of topics (n)
         topics_num: usize,
@@ -243,11 +229,10 @@ pub mod course {
 
     #[derive(Debug, Clone, Copy)]
     pub struct Topic {
-        index: usize,
-        beauty: usize,
-        difficulty: usize,
+        pub id: usize,
+        pub beauty: usize,
+        pub difficulty: usize,
     }
-
 
     impl CourseProblem {
         pub fn new(topics_num: usize, topics: Vec<Topic>) -> Self {
@@ -259,18 +244,43 @@ pub mod course {
 
         pub fn solve(&self) -> usize {
             // order two copies of the topics: one by beauty and one by difficulty
+            let mut topics_sorted_beauty = self.topics.clone();
+            let mut topics_sorted_difficulty = self.topics.clone();
+
+            topics_sorted_beauty.sort_by(|a, b| a.beauty.cmp(&b.beauty));
+            topics_sorted_difficulty.sort_by(|a, b| a.difficulty.cmp(&b.difficulty));
 
             // find the LCS
+            let rows = self.topics_num + 1;
+            let cols = self.topics_num + 1;
+            let mut mat = vec![vec![0; cols]; rows]; // +1 because we have a row and column full of 0s
 
-            return 0;
+            for i in 0..rows {
+                mat[i][0] = 0;
+            }
+
+            for i in 0..cols {
+                mat[0][i] = 0;
+            }
+
+            for i in 1..rows {
+                for j in 1..cols {
+                    if topics_sorted_beauty[i-1].id == topics_sorted_beauty[j-1].id {
+                        mat[i][j] = mat[i - 1][j - 1] + 1;
+                    } else {
+                        mat[i][j] = std::cmp::max(mat[i - 1][j], mat[i][j - 1]);
+                    }
+                }
+            }
+
+            if DEBUG {
+                println!("mat:\n{:?}", mat);
+            }
+
+            return mat[rows-1][cols-1];
         }
-
     }
-
-
-
 }
-
 
 /// # Tests for EXERCISE 2
 ///
@@ -291,9 +301,59 @@ pub mod course {
 /// The output files contains the largest number of selected topics.
 #[cfg(test)]
 mod tests2 {
-    use super::*;
     use super::course::*;
+    use super::*;
     use std::fs;
+
+    fn read_input(filename: &str) -> (usize, Vec<Topic>) {
+        let contents = fs::read_to_string(filename).expect("Failed to read file");
+        let mut lines = contents.lines();
+        let topics_num = lines.next().unwrap().parse().unwrap();
+
+        let mut id_counter: usize = 0;
+
+        let topics: Vec<Topic> = lines
+            .map(|line| {
+                let mut split = line.split_whitespace();
+                let my_topic = Topic {
+                    id: id_counter,
+                    beauty: split.next().unwrap().parse().unwrap(),
+                    difficulty: split.next().unwrap().parse().unwrap(),
+                };
+                id_counter += 1;
+                return my_topic;
+            })
+            .collect();
+
+        (topics_num, topics)
+    }
+
+    fn read_output(filename: &str) -> usize {
+        fs::read_to_string(filename)
+            .expect("Failed to read file")
+            .trim()
+            .parse()
+            .expect("Failed to parse output")
+    }
+
+    #[test]
+    fn tests2_range() {
+        let folder = "testsets/handson3-course";
+        let tests_num = 7;
+
+        for i in 0..=tests_num {
+            let input_filename = format!("{}/input{}.txt", folder, i);
+            let (topics_num, topics) = read_input(&input_filename);
+            let expected_output_filename = format!("{}/output{}.txt", folder, i);
+            let expected_output = read_output(&expected_output_filename);
+
+            let problem = CourseProblem::new(topics_num, topics);
+            let result = problem.solve();
+
+            assert_eq!(result, expected_output);
+            println!("Test file number {} passed!", i);
+        }
+
+        print!("All {} tests passed!\n", tests_num);
+    }
 }
-
-
