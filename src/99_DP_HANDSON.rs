@@ -265,13 +265,13 @@ pub mod course {
 
             for i in 1..rows {
                 for j in 1..cols {
-                    if topics_sorted_beauty[i-1].id == topics_sorted_beauty[j-1].id {
+                    if topics_sorted_beauty[i-1].id == topics_sorted_difficulty[j-1].id {
                         mat[i][j] = mat[i - 1][j - 1] + 1;
                     } else {
                         mat[i][j] = std::cmp::max(mat[i - 1][j], mat[i][j - 1]);
                     }
                 }
-            }
+            }            
 
             if DEBUG {
                 println!("mat:\n{:?}", mat);
