@@ -39,7 +39,7 @@ pub mod holiday_planning {
 
         /// returns the number of attractions you can visit in `city` at the `day` day
         pub fn get_itinerary(&self, city: usize, day: usize) -> usize {
-            self.itineraries[city][day]
+            self.itineraries[city-1][day] // -1 because the cities start at 1 in the table
         }
 
         /// Helper method to get a solution from the table
@@ -81,8 +81,8 @@ pub mod holiday_planning {
                 self.set_solution(i, 0, 0);
             }
 
-            for city in 1..self.cities {
-                for day in 1..self.days {
+            for city in 1..=self.cities {
+                for day in 1..=self.days {
                     let mut candidates: Vec<usize> = Vec::new();
 
                     candidates.push(self.get_solution(city - 1, day)); // cell above (same amount of days, but we do not pick the current city at all)
