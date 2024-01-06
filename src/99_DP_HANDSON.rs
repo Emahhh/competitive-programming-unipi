@@ -6,7 +6,7 @@ fn main() {
 }
 
 /* trunk-ignore(clippy/dead_code) */
-const DEBUG: bool = false;
+const DEBUG: bool = true;
 const TESTS_FOLDER: &str = "testsets/handson3-holiday/";
 
 // https://pages.di.unipi.it/rossano/blog/2023/handson32324/
@@ -265,7 +265,7 @@ pub mod course {
 
             for i in 1..rows {
                 for j in 1..cols {
-                    if topics_sorted_beauty[i-1].id == topics_sorted_difficulty[j-1].id {
+                    if topics_sorted_beauty[i - 1].id == topics_sorted_difficulty[j - 1].id {
                         mat[i][j] = mat[i - 1][j - 1] + 1;
                     } else {
                         mat[i][j] = std::cmp::max(mat[i - 1][j], mat[i][j - 1]);
@@ -274,7 +274,7 @@ pub mod course {
             }
 
             if DEBUG {
-                println!("mat:\n{:?}", mat);
+                println!("mat:\n{:?}\n\n", mat);
             }
 
             // reconstruct the solution (the selected topics)
@@ -292,31 +292,33 @@ pub mod course {
                     j -= 1;
                 }
             }
+            topics.reverse();
+            // topics now contains a selection of topics that satisfy the requirements (strictly increasing)
 
             // check that it is STRICTLY increasing, by removing consecutive topics that have same beauty or difficulty
             let mut k = 0;
             while k < topics.len() - 1 {
-               if topics[k].beauty == topics[k + 1].beauty || topics[k].difficulty == topics[k + 1].difficulty {
-                   topics.remove(k);
-               } else {
-                   k += 1;
-               }
+                if topics[k].beauty == topics[k + 1].beauty
+                    || topics[k].difficulty == topics[k + 1].difficulty
+                {
+                    topics.remove(k);
+                } else {
+                    k += 1;
+                }
             }
             // now `topics` has been filtered and is strictly increasing
 
-            if DEBUG {
-                println!("topics: {:?}", topics);
-            }
-
             // count topics
-            let mut count = 0;
-            for topic in topics {
-                count += 1;
+            let mut count_topics = 0;
+            for _topic in &topics {
+                count_topics += 1;
             }
 
+            if DEBUG {
+                println!("{:?} topics found: {:?}\n\n", count_topics, topics);
+            }
 
-
-            return count;
+            return count_topics;
         }
     }
 }
