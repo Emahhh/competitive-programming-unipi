@@ -170,7 +170,7 @@ mod tests1 {
 
     /// Runs the first `tests_num` tests in `folder`
     #[test]
-    fn test1_range() {
+    fn tests1_range() {
         let folder = TESTS_FOLDER;
         let tests_num = 4;
 
