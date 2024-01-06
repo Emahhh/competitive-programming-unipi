@@ -271,13 +271,52 @@ pub mod course {
                         mat[i][j] = std::cmp::max(mat[i - 1][j], mat[i][j - 1]);
                     }
                 }
-            }            
+            }
 
             if DEBUG {
                 println!("mat:\n{:?}", mat);
             }
 
-            return mat[rows-1][cols-1];
+            // reconstruct the solution (the selected topics)
+            let mut i = rows - 1;
+            let mut j = cols - 1;
+            let mut topics = Vec::new();
+            while i > 0 && j > 0 {
+                if topics_sorted_beauty[i - 1].id == topics_sorted_difficulty[j - 1].id {
+                    topics.push(topics_sorted_beauty[i - 1]);
+                    i -= 1;
+                    j -= 1;
+                } else if mat[i - 1][j] > mat[i][j - 1] {
+                    i -= 1;
+                } else {
+                    j -= 1;
+                }
+            }
+
+            // check that it is STRICTLY increasing, by removing consecutive topics that have same beauty or difficulty
+            let mut k = 0;
+            while k < topics.len() - 1 {
+               if topics[k].beauty == topics[k + 1].beauty || topics[k].difficulty == topics[k + 1].difficulty {
+                   topics.remove(k);
+               } else {
+                   k += 1;
+               }
+            }
+            // now `topics` has been filtered and is strictly increasing
+
+            if DEBUG {
+                println!("topics: {:?}", topics);
+            }
+
+            // count topics
+            let mut count = 0;
+            for topic in topics {
+                count += 1;
+            }
+
+
+
+            return count;
         }
     }
 }
