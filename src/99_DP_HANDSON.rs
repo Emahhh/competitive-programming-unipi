@@ -1,21 +1,16 @@
 #![allow(unused_imports)]
 #![allow(unused_parens)]
 
-fn main() {
-    println!("Hello, dynamic programming!");
-}
+// https://pages.di.unipi.it/rossano/blog/2023/handson32324/
 
-/* trunk-ignore(clippy/dead_code) */
 const DEBUG: bool = true;
 const TESTS_FOLDER: &str = "testsets/handson3-holiday/";
 
-// https://pages.di.unipi.it/rossano/blog/2023/handson32324/
-
-/// EXERCISE 1
+/// # EXERCISE 1
 pub mod holiday_planning {
     use super::DEBUG;
 
-    pub struct Problem {
+    pub struct HolidayProblem {
         /// Number of cities visitable (n)
         cities: usize,
 
@@ -29,7 +24,7 @@ pub mod holiday_planning {
         subproblems_table: Vec<Vec<usize>>,
     }
 
-    impl Problem {
+    impl HolidayProblem {
         pub fn new(cities: usize, days: usize) -> Self {
             Self {
                 cities,
@@ -127,9 +122,10 @@ pub mod holiday_planning {
     }
 }
 
+/// # Tests for EXERCISE 1
 #[cfg(test)]
 mod tests1 {
-    use super::holiday_planning::Problem;
+    use super::holiday_planning::HolidayProblem;
     use super::*;
     use std::fs;
 
@@ -172,6 +168,7 @@ mod tests1 {
             .expect("Failed to parse output")
     }
 
+    /// Runs the first `tests_num` tests in `folder`
     #[test]
     fn test1_range() {
         let folder = TESTS_FOLDER;
@@ -183,7 +180,7 @@ mod tests1 {
             let expected_output_filename = format!("{}{}", folder, format!("output{}.txt", i));
             let expected_output = read_output(&expected_output_filename);
 
-            let mut problem = Problem::new(cities, days);
+            let mut problem = HolidayProblem::new(cities, days);
             for itinerary in itineraries {
                 problem.set_itinerary(itinerary);
             }
@@ -208,9 +205,10 @@ mod tests1 {
     }
 }
 
-//----------------------
+//--------------------------------------------------------------
 
-/// EXERCISE 2
+/// # EXERCISE 2
+///
 /// A professor has to prepare a new course.
 /// he knows the beauty b_i and the difficulty d_i of each topic i.
 /// students appreciate a course only if each lecture is more beautiful than the previous one.
@@ -220,28 +218,37 @@ pub mod course {
 
     use super::DEBUG;
 
-    pub struct CourseProblem {
-        /// Number of topics (n)
-        topics_num: usize,
-
-        topics: Vec<Topic>,
-    }
-
     #[derive(Debug, Clone, Copy)]
     pub struct Topic {
+        /// identifier (used to check if 2 topics are the same topic)
         pub id: usize,
+
         pub beauty: usize,
         pub difficulty: usize,
     }
 
+    pub struct CourseProblem {
+        /// Number of topics (n)
+        topics_num: usize,
+
+        /// A list of possible topics for the course.
+        topics: Vec<Topic>,
+    }
+
     impl CourseProblem {
-        pub fn new(topics_num: usize, topics: Vec<Topic>) -> Self {
+        pub fn new(topics_num: usize, topics_vec: Vec<Topic>) -> Self {
             Self {
                 topics_num,
-                topics: topics,
+                topics: topics_vec,
             }
         }
 
+        /// Solves the course problem.
+        ///
+        /// # Returns
+        ///
+        /// A vector of `Topic`(s) that represent a valid selection for the course, given the constraints.
+        /// The vector is ordered by increasing difficulty and beauty.
         pub fn solve(&self) -> Vec<Topic> {
             // order two copies of the topics: one by beauty and one by difficulty
             let mut topics_sorted_beauty = self.topics.clone();
@@ -251,10 +258,11 @@ pub mod course {
             topics_sorted_difficulty.sort_by(|a, b| a.difficulty.cmp(&b.difficulty));
 
             // find the LCS
-            let rows = self.topics_num + 1;
+            let rows = self.topics_num + 1; // +1 because we have a row and column full of 0s
             let cols = self.topics_num + 1;
-            let mut mat = vec![vec![0; cols]; rows]; // +1 because we have a row and column full of 0s
+            let mut mat = vec![vec![0; cols]; rows];
 
+            // filling first col and row with 0s
             for i in 0..rows {
                 mat[i][0] = 0;
             }
@@ -263,6 +271,7 @@ pub mod course {
                 mat[0][i] = 0;
             }
 
+            // using the algo to fill the rest of the table
             for i in 1..rows {
                 for j in 1..cols {
                     if topics_sorted_beauty[i - 1].id == topics_sorted_difficulty[j - 1].id {
@@ -296,10 +305,10 @@ pub mod course {
                     j -= 1;
                 }
             }
-            topics.reverse();
-            // topics now contains a selection of topics that satisfy the requirements (strictly increasing)
 
-            // check that it is STRICTLY increasing, by removing consecutive topics that have same beauty or difficulty
+            topics.reverse(); // nonstrictly strictly increasing
+
+            // check that `topics` is STRICTLY increasing, by removing consecutive topics that have same beauty or difficulty
             let mut k = 0;
             while k < topics.len() - 1 {
                 if topics[k].beauty == topics[k + 1].beauty
@@ -310,9 +319,10 @@ pub mod course {
                     k += 1;
                 }
             }
-            // now `topics` has been filtered and is strictly increasing
 
-            return topics;
+            // topics now contains an ordered selection of topics that satisfy the requirements (STRICTLY increasing)
+
+            topics
         }
     }
 }
@@ -371,6 +381,7 @@ mod tests2 {
             .expect("Failed to parse output")
     }
 
+    /// Runs the first `tests_num` tests in `folder`
     #[test]
     fn tests2_range() {
         let folder = "testsets/handson3-course";
@@ -396,4 +407,8 @@ mod tests2 {
 
         print!("All {} tests passed!\n", tests_num);
     }
+}
+
+fn main() {
+    println!("Hello, dynamic programming!");
 }
