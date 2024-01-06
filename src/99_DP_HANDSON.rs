@@ -242,7 +242,7 @@ pub mod course {
             }
         }
 
-        pub fn solve(&self) -> usize {
+        pub fn solve(&self) -> Vec<Topic> {
             // order two copies of the topics: one by beauty and one by difficulty
             let mut topics_sorted_beauty = self.topics.clone();
             let mut topics_sorted_difficulty = self.topics.clone();
@@ -274,7 +274,11 @@ pub mod course {
             }
 
             if DEBUG {
-                println!("mat:\n{:?}\n\n", mat);
+                let mut output = String::new();
+                for row in &mat {
+                    output.push_str(&format!("{:?}\n", row));
+                }
+                println!("{}", output);
             }
 
             // reconstruct the solution (the selected topics)
@@ -308,17 +312,7 @@ pub mod course {
             }
             // now `topics` has been filtered and is strictly increasing
 
-            // count topics
-            let mut count_topics = 0;
-            for _topic in &topics {
-                count_topics += 1;
-            }
-
-            if DEBUG {
-                println!("{:?} topics found: {:?}\n\n", count_topics, topics);
-            }
-
-            return count_topics;
+            return topics;
         }
     }
 }
@@ -389,9 +383,14 @@ mod tests2 {
             let expected_output = read_output(&expected_output_filename);
 
             let problem = CourseProblem::new(topics_num, topics);
-            let result = problem.solve();
+            let topics = problem.solve(); // topics now contains a selection of topics that satisfy the requirements
+            let topics_num = topics.len();
 
-            assert_eq!(result, expected_output);
+            if DEBUG {
+                println!("{:?} topics found: {:?}\n\n", topics_num, topics);
+            }
+
+            assert_eq!(topics_num, expected_output);
             println!("Test file number {} passed!", i);
         }
 
