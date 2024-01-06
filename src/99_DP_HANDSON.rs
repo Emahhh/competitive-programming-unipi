@@ -3,8 +3,11 @@
 
 // https://pages.di.unipi.it/rossano/blog/2023/handson32324/
 
-const DEBUG: bool = true;
-const TESTS_FOLDER: &str = "testsets/handson3-holiday/";
+const DEBUG: bool = false;
+
+fn main() {
+    println!("Hello, dynamic programming!");
+}
 
 /// # EXERCISE 1
 pub mod holiday_planning {
@@ -169,11 +172,8 @@ mod tests1 {
     }
 
     /// Runs the first `tests_num` tests in `folder`
-    #[test]
-    fn tests1_range() {
-        let folder = TESTS_FOLDER;
-        let tests_num = 4;
-
+    /// The tests must be in the format input*.txt and output*.txt
+    fn range_tests(folder: &str, tests_num: usize) {
         for i in 0..=tests_num {
             let input_filename = format!("{}{}", folder, format!("input{}.txt", i));
             let (cities, days, itineraries) = read_input(&input_filename);
@@ -198,10 +198,16 @@ mod tests1 {
             }
 
             assert_eq!(result, expected_output);
-            println!("Test file number {} passed!", i);
+            
+            println!("Exercise 1: test file number {} passed!", i);
         }
 
-        print!("All {} tests passed!\n", tests_num);
+        print!("Exercise 1: all {} tests passed! 🎉🎊\n", tests_num);
+    }
+
+    #[test]
+    fn tests1_range() {
+        range_tests("testsets/handson3-holiday/", 4);
     }
 }
 
@@ -382,11 +388,8 @@ mod tests2 {
     }
 
     /// Runs the first `tests_num` tests in `folder`
-    #[test]
-    fn tests2_range() {
-        let folder = "testsets/handson3-course";
-        let tests_num = 7;
-
+    /// The tests must be in the format input*.txt and output*.txt
+    fn range_tests2(folder: &str, tests_num: usize) {
         for i in 0..=tests_num {
             let input_filename = format!("{}/input{}.txt", folder, i);
             let (topics_num, topics) = read_input(&input_filename);
@@ -402,13 +405,14 @@ mod tests2 {
             }
 
             assert_eq!(topics_num, expected_output);
-            println!("Test file number {} passed!", i);
+            println!("Exercise 2: test file number {} passed!", i);
         }
 
-        print!("All {} tests passed!\n", tests_num);
+        print!("Exercise2: all {} tests passed! 🎉🎊\n", tests_num);
     }
-}
 
-fn main() {
-    println!("Hello, dynamic programming!");
+    #[test]
+    fn tests2_range() {
+        range_tests2("testsets/handson3-course", 7);
+    }
 }
