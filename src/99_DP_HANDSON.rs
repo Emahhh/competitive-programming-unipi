@@ -208,14 +208,12 @@ mod tests1 {
     }
 }
 
-//----------------------
-
 /// EXERCISE 2
 /// A professor has to prepare a new course.
-/// he knows the beauty b_i and the difficulty d_i of each topic i.
-/// students appreciate a course only if each lecture is more beautiful than the previous one.
-/// the topics must exhibit increasing levels of difficulty.
-/// objective is to select the maximum number of topics for his upcoming course.
+/// He knows the beauty b_i and the difficulty d_i of each topic i.
+/// Students appreciate a course only if each lecture is more beautiful than the previous one.
+/// The topics must exhibit increasing levels of difficulty.
+/// The objective is to select the maximum number of topics for his upcoming course.
 pub mod course {
 
     use super::DEBUG;
@@ -238,19 +236,35 @@ pub mod course {
         pub fn new(topics_num: usize, topics: Vec<Topic>) -> Self {
             Self {
                 topics_num,
-                topics: topics,
+                topics,
             }
         }
 
+
+        // Helper function to get the last selected topic based on increasing beauty and difficulty
+        // strategy: go diagonal until you find a match in the left or top cell. that is the last selected.
+        pub fn get_last_selected(topics_sorted_difficulty: &[Topic], mut i: usize, mut j: usize, mat: &Vec<Vec<usize>>) -> Topic {
+
+            if mat[i][j] == mat[i - 1][j]{
+                return topics_sorted_difficulty[i - 2];
+            }
+
+            if mat[i][j] == mat[i][j - 1]{
+                return topics_sorted_difficulty[j - 2];
+            }
+
+            return Self::get_last_selected(topics_sorted_difficulty, i - 1, j - 1, mat);
+        }
+
         pub fn solve(&self) -> usize {
-            // order two copies of the topics: one by beauty and one by difficulty
+            // Order two copies of the topics: one by beauty and one by difficulty
             let mut topics_sorted_beauty = self.topics.clone();
             let mut topics_sorted_difficulty = self.topics.clone();
 
             topics_sorted_beauty.sort_by(|a, b| a.beauty.cmp(&b.beauty));
             topics_sorted_difficulty.sort_by(|a, b| a.difficulty.cmp(&b.difficulty));
 
-            // find the LCS
+            // Find the LCS
             let rows = self.topics_num + 1;
             let cols = self.topics_num + 1;
             let mut mat = vec![vec![0; cols]; rows]; // +1 because we have a row and column full of 0s
@@ -265,20 +279,23 @@ pub mod course {
 
             for i in 1..rows {
                 for j in 1..cols {
-                    // we check if there is a mach (we found the same topic, hence the same id)
+                    // We check if there is a match (we found the same topic, hence the same id)
                     let is_same_topic = topics_sorted_beauty[i - 1].id == topics_sorted_difficulty[j - 1].id;
+                    let is_first = i <= 1 || j <= 1;
 
-                    if is_same_topic {
-                        // if there is a match, we also have to make sure that the order is increasing
-                        // i.e. that the beaury and diff of the current topic is greater than the previous selected
+                    if is_same_topic && !is_first {
+                        // If there is a match, we also have to make sure that the order is increasing
+                        // i.e., that the beauty and difficulty of the current topic are greater than the previously selected
                         let current_topic = topics_sorted_beauty[i - 1];
-                        let last_selected = get_last_selected(&topics_sorted_difficulty, i, j);
+                        let last_selected = Self::get_last_selected(&topics_sorted_difficulty, i, j, &mat);
 
                         let is_beauty_increasing = current_topic.beauty > last_selected.beauty;
                         let is_difficulty_increasing = current_topic.difficulty > last_selected.difficulty;
 
                         if is_beauty_increasing && is_difficulty_increasing {
                             mat[i][j] = mat[i - 1][j - 1] + 1;
+                        } else {
+                            mat[i][j] = std::cmp::max(mat[i - 1][j], mat[i][j - 1]);
                         }
 
                     } else {
@@ -287,18 +304,23 @@ pub mod course {
                     }
                 }
             }
-            
-            
-                
 
             if DEBUG {
                 println!("mat:\n{:?}", mat);
             }
 
             return mat[rows-1][cols-1];
+
+            
         }
+
+
+        
     }
+
+
 }
+
 
 /// # Tests for EXERCISE 2
 ///
